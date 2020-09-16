@@ -57,7 +57,8 @@ class Config(object):
         self.job_name = str(config_json["job_name"])
         self.num_gpus = int(config_json["num_gpus"])
         self.num_workers = int(config_json["num_workers"])
-        FLAGS.modelZooBasePath = config_json.get("modelZooBasePath", os.path.join(os.getenv("HOME"), ".eztransfer_modelzoo"))
+        if not FLAGS.usePAI:
+            FLAGS.modelZooBasePath = config_json.get("modelZooBasePath", os.path.join(os.getenv("HOME"), ".eztransfer_modelzoo"))
         tf.logging.info("***************** modelZooBasePath {} ***************".format(FLAGS.modelZooBasePath))
         if self.mode == 'train' or self.mode == "train_and_evaluate" \
                 or self.mode == "train_and_evaluate_on_the_fly" or self.mode == "train_on_the_fly":
@@ -573,10 +574,9 @@ class EzTransEstimator(object):
         self.estimator.train(input_fn=reader.get_input_fn(),
                              max_steps=self.train_steps)
 
-    def run_evaluate(self, reader, checkpoint_path=None, hooks=None):
+    def run_evaluate(self, reader, checkpoint_path=None):
         return self.estimator.evaluate(input_fn=reader.get_input_fn(),
                                        steps=self.num_eval_steps,
-                                       hooks=hooks,
                                        checkpoint_path=checkpoint_path)
 
     def run_predict(self, reader, writer=None, checkpoint_path=None, yield_single_examples=False):
