@@ -20,5 +20,8 @@ from .labeling_loss import sequence_labeling_loss
 from .comprehension_loss import comprehension_loss
 from .kd_loss import build_kd_loss, build_kd_probes_loss
 from .matching_loss import matching_embedding_margin_loss
-from .pretrain_loss import masked_language_model_loss, next_sentence_prediction_loss, image_reconstruction_mse_loss
+from .pretrain_loss import masked_language_model_loss
+from .pretrain_loss import next_sentence_prediction_loss
+from .pretrain_loss import image_reconstruction_mse_loss
+from .pretrain_loss import image_reconstruction_kld_loss
 

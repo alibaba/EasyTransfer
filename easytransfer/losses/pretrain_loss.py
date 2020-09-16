@@ -56,6 +56,22 @@ def image_reconstruction_mse_loss(mpm_logits, target_raw_patch_features,
 
     image_loss = tf.keras.losses.mean_squared_error(image_target_probs, image_pred_probs)
     image_loss = tf.reduce_mean(image_loss)
-    tf.summary.scalar("image_reconstruction_loss", image_loss)
+    tf.summary.scalar("image_reconstruction_mse_loss", image_loss)
+
+    return image_loss
+
+def image_reconstruction_kld_loss(mpm_logits, target_raw_patch_features,
+                              masked_image_token_num, patch_feature_size):
+
+    image_pred_probs = tf.nn.softmax(mpm_logits)
+    image_pred_probs = tf.reshape(image_pred_probs,
+                                  (-1, masked_image_token_num, patch_feature_size))
+    image_target_probs = tf.reshape(tf.nn.softmax(target_raw_patch_features),
+                                    (-1, masked_image_token_num,
+                                     patch_feature_size))
+
+    image_loss = tf.keras.losses.KLD(image_target_probs, image_pred_probs)
+    image_loss = tf.reduce_mean(image_loss)
+    tf.summary.scalar("image_reconstruction_kld_loss", image_loss)
 
     return image_loss

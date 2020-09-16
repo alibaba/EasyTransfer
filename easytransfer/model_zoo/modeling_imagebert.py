@@ -291,7 +291,7 @@ class ImageBertPreTrainedModel(PreTrainedModel):
             masked_patch_positions = tf.ones(shape=[batch_size, self.config.masked_image_token_num], dtype=tf.int64)
 
         if image_feature is None:
-            image_feature = tf.constant([[1.0] * 131072, [1.0] *131072, [1.0] *131072], dtype=tf.float32)
+            image_feature = tf.constant([[1.0] * kwargs.get("image_feature_size", 131072)], dtype=tf.float32)
 
         image_feature = tf.reshape(image_feature, [-1, self.config.max_patch_position_embeddings, self.config.patch_feature_size])
         if kwargs['mode'] == tf.estimator.ModeKeys.PREDICT:

@@ -67,14 +67,14 @@ wordpiece_model_name_vocab_path_map = {
     'pai-bert-large-en': "bert/pai-bert-large-en/vocab.txt",
     'hit-roberta-base-zh': "roberta/hit-roberta-base-zh/vocab.txt",
     'hit-roberta-large-zh': "roberta/hit-roberta-large-zh/vocab.txt",
-    'pai-imagebert-base-zh': "bert/pai-imagebert-base-zh/vocab.txt",
-    'pai-videobert-base-zh': "bert/pai-videobert-base-zh/vocab.txt",
+    'pai-imagebert-base-zh': "imagebert/pai-imagebert-base-zh/vocab.txt",
+    'pai-videobert-base-zh': "imagebert/pai-videobert-base-zh/vocab.txt",
     'brightmart-roberta-small-zh': "roberta/brightmart-roberta-small-zh/vocab.txt",
     'brightmart-roberta-large-zh': "roberta/brightmart-roberta-large-zh/vocab.txt",
-    'icbu-imagebert-small-en': "bert/icbu-imagebert-small-en/vocab.txt",
+    'icbu-imagebert-small-en': "imagebert/icbu-imagebert-small-en/vocab.txt",
     'pai-transformer-base-zh': "transformer/pai-transformer-base-zh/vocab.txt",
     'pai-factorizedbert-base-en': "bert/pai-factorizedbert-base-en/vocab.txt",
-    'sigir-imagebert-base-en': "bert/sigir-imagebert-base-en/vocab.txt"
+    'pai-imagebert-base-en': "imagebert/pai-imagebert-base-en/vocab.txt"
 }
 
 def truncate_seq_pair(tokens_a, tokens_b, max_length):
