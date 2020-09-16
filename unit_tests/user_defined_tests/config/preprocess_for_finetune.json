@@ -1,0 +1,15 @@
+{
+  "preprocess_config": {
+    "input_schema": "sent_1:str:1,sent_2:str:1,label:str:1",
+    "tokenizer_name_or_path":"google-bert-base-zh",
+    "first_sequence": "sent_1",
+    "second_sequence": "sent_2",
+    "label_name": "label",
+    "label_enumerate_values": "0,1",
+    "output_schema": "input_ids,input_mask,segment_ids,label_id",
+    "sequence_length": 16,
+    "preprocess_batch_size": 4,
+    "preprocess_input_fp": "../ut_data/user_defined_test_data/test_preprocess.csv",
+    "preprocess_output_fp": "output/preprocess_output_for_finetune.csv"
+  }
+}

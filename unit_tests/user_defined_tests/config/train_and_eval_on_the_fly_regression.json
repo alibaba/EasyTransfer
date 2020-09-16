@@ -1,0 +1,42 @@
+{
+    "preprocess_config": {
+        "input_schema": "example_id:int:1,query1:str:1,query2:str:1,is_same_question:str:1,category:str:1,score:float:1",
+        "first_sequence": "query1",
+        "second_sequence": "query2",
+        "tokenizer_name_or_path":"/home/jerry.lp/my_model_zoo/bert/google-bert-base-zh/vocab.txt",
+        "label_name": "score",
+        "label_enumerate_values": null,
+        "sequence_length": 64
+    },
+    "model_config": {
+        "pretrain_model_name_or_path": "google-bert-base-zh",
+        "num_labels": 1
+    },
+    "train_config": {
+        "train_input_fp": "../ut_data/user_defined_test_data/test_on_the_fly_train.csv",
+        "train_batch_size": 2,
+        "num_epochs": 0.001,
+        "model_dir": "cache_train_and_eval_on_the_fly_regression",
+        "save_steps": null,
+        "log_step_count_steps": 100,
+        "throttle_secs": 100,
+        "keep_checkpoint_max": 10,
+        "optimizer_config": {
+            "optimizer": "adam",
+            "learning_rate": 2e-5,
+            "lr_decay": "polynomial",
+            "warmup_ratio": 0.1,
+            "weight_decay_ratio": 0,
+            "gradient_clip": true
+        },
+        "distribution_config": {
+            "distribution_strategy": null,
+            "num_accumulated_batches": 1
+        }
+    },
+    "evaluate_config": {
+        "eval_input_fp": "../ut_data/user_defined_test_data/test_on_the_fly_dev.csv",
+        "eval_batch_size": 32,
+        "num_eval_steps": null
+    }
+}

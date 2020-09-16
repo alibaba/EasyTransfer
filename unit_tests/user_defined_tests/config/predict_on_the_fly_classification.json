@@ -1,0 +1,19 @@
+{
+  "preprocess_config": {
+    "input_schema": "example_id:int:1,query1:str:1,query2:str:1,category:str:1,score:float:1",
+    "first_sequence": "query1",
+    "second_sequence": "query2",
+    "sequence_length": 128,
+    "output_schema": "predictions,logits,example_id,score"
+  },
+  "model_config": {
+    "pretrain_model_name_or_path": "google-bert-base-zh",
+    "num_labels": 2
+  },
+  "predict_config": {
+    "predict_checkpoint_path": "cache_train_and_eval_on_the_fly_classification/model.ckpt-0",
+    "predict_input_fp": "../ut_data/user_defined_test_data/test_on_the_fly_test.csv",
+    "predict_output_fp": "cache_train_and_eval_on_the_fly_classification/test_pred_out.csv",
+    "predict_batch_size": 2
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "preprocess_config": {
+    "input_schema": "input_ids:int:8,input_mask:int:8,segment_ids:int:8,label_id:int:1",
+    "output_schema": "predictions,logits"
+  },
+  "model_config": {
+    "pretrain_model_name_or_path": "google-bert-base-zh",
+    "num_labels": 15
+  },
+  "predict_config": {
+    "predict_checkpoint_path": "cache_train_eval/model.ckpt-0",
+    "predict_input_fp": "../ut_data/user_defined_test_data/test_train_eval_predict_dev_features.csv",
+    "predict_output_fp": "output/test_train_eval_predict_dev_features_pred_out.csv",
+    "predict_batch_size": 2
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "preprocess_config": {
+    "input_schema": "example_id:int:1,query1:str:1,query2:str:1,category:str:1,score:float:1",
+    "first_sequence": "query1",
+    "second_sequence": "query2",
+    "sequence_length": 32,
+    "preprocess_batch_size": 4,
+    "output_schema": "pool_output,example_id"
+  },
+  "model_config": {
+    "pretrain_model_name_or_path": "pai-bert-base-zh"
+  },
+  "predict_config": {
+    "predict_checkpoint_path": "/home/jerry.lp/.eztransfer_modelzoo/bert/pai-bert-base-zh",
+    "predict_input_fp": "../ut_data/user_defined_test_data/test_on_the_fly_test.csv",
+    "predict_output_fp": "output/test_dist_pred_out.csv",
+    "predict_batch_size": 2
+  }
+}

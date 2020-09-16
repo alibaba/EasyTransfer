@@ -1,0 +1,12 @@
+{
+  "model_config": {
+    "pretrain_model_name_or_path": "pai-bert-base-zh",
+    "num_labels": 15
+  },
+  "export_config": {
+    "input_tensors_schema": "input_ids:int:64,input_mask:int:64,segment_ids:int:64,label_ids:int:1",
+    "receiver_tensors_schema": "input_ids:int:64,input_mask:int:64,segment_ids:int:64",
+    "export_dir_base": "/home/jerry.lp/.eztransfer_modelzoo/bert/pai-bert-base-zh",
+    "checkpoint_path": "/home/jerry.lp/.eztransfer_modelzoo/bert/pai-bert-base-zh/model.ckpt"
+  }
+}

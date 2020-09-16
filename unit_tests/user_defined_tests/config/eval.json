@@ -1,0 +1,31 @@
+{
+  "preprocess_config": {
+    "input_schema": "input_ids:int:8,input_mask:int:8,segment_ids:int:8,label_id:int:1"
+  },
+  "model_config": {
+    "pretrain_model_name_or_path": "google-bert-base-zh",
+    "num_labels": 15
+  },
+  "train_config": {
+    "train_input_fp": "../ut_data/user_defined_test_data/test_train_eval_predict_train_features.csv",
+    "train_batch_size": 2,
+    "save_steps": null,
+    "num_epochs": 0.000001,
+    "model_dir": "cache_train",
+    "optimizer_config": {
+      "optimizer": "adam",
+      "weight_decay_ratio": 0,
+      "warmup_ratio": 0.1,
+      "learning_rate": 5e-5
+    },
+    "distribution_config": {
+      "distribution_strategy": null
+    }
+  },
+  "evaluate_config": {
+    "eval_checkpoint_path": "cache_train/model.ckpt-0",
+    "eval_input_fp": "../ut_data/user_defined_test_data/test_train_eval_predict_dev_features.csv",
+    "eval_batch_size": 8,
+    "num_eval_steps": 10
+  }
+}
