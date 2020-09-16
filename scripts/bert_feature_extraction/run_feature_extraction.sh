@@ -15,10 +15,9 @@
 # limitations under the License.
 #
 # Easy Transfer AppZoo: Feature Extraction (BERT) Example
-
-export MODEL_ZOO_BASE=../../data  # the directory of your downloaded pre-train models
-
-wget http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/ez_bert_feat/test.csv
+if [ ! -f ./test.csv ]; then
+  wget http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/ez_bert_feat/test.csv
+fi
 
 # Arguments:
 #   --inputTable: input source, only the ${test_file},
@@ -40,5 +39,4 @@ ez_bert_feat \
   --outputSchema=pool_output \
   --modelName=google-bert-base-zh \
   --sequenceLength=32 \
-  --batchSize=100 \
-  --modelZooBasePath=${MODEL_ZOO_BASE}
+  --batchSize=100
