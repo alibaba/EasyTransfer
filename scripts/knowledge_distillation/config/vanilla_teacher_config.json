@@ -1,0 +1,45 @@
+{
+  "preprocess_config": {
+    "input_schema": "content:str:1,label:str:1",
+    "first_sequence": "content",
+    "second_sequence": null,
+    "sequence_length": 128,
+    "label_name": "label",
+    "label_enumerate_values": "0,1",
+    "output_schema": "logits,input_ids,input_mask,segment_ids,label_id"
+  },
+  "model_config": {
+    "pretrain_model_name_or_path": "google-bert-base-en",
+    "num_labels": 2,
+    "dropout_rate": 0.1,
+    "train_probes": false
+  },
+  "train_config": {
+    "train_input_fp": "./sst2_train.tsv",
+    "train_batch_size": 32,
+    "save_steps": null,
+    "num_epochs": 5,
+    "model_dir": "./vanilla_teacher_models",
+    "throttle_secs": 100,
+    "optimizer_config": {
+      "optimizer": "adam",
+      "weight_decay_ratio": 0,
+      "warmup_ratio": 0.1,
+      "learning_rate": 2e-5
+    },
+    "distribution_config": {
+      "distribution_strategy": null
+    }
+  },
+  "evaluate_config": {
+    "eval_checkpoint_path": "./vanilla_teacher_models/model.ckpt-4208",
+    "eval_input_fp":  "./sst2_dev.tsv",
+    "eval_batch_size": 8
+  },
+  "predict_config": {
+    "predict_checkpoint_path": "./vanilla_teacher_models/model.ckpt-4208",
+    "predict_input_fp": "./sst2_dev.tsv",
+    "predict_batch_size": 256,
+    "predict_output_fp": "./sst2_dev_logits.tsv"
+  }
+}
