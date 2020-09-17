@@ -1,32 +1,30 @@
 # Fashionbert工具使用指南
 ### 预训练fashionbert
 ```bash
-wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/pai-imagebert-base-en.tgz
-wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/vocab.txt
-tar -zxf pai-imagebert-base-en.tgz
+wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/fashionbert_fashiongen_patch_train_1K
 
-export CUDA_VISIBLE_DEVICES="0,1,2,3"
+ls -d $PWD/fashionbert_fashiongen_patch_train_1K > train_list.list_csv
+ls -d $PWD/fashionbert_fashiongen_patch_train_1K > dev_list.list_csv
+
+export CUDA_VISIBLE_DEVICES="0"
 
 python pretrain_main.py \
-  --workerGPU=4 \
+  --workerGPU=1 \
   --mode=train_and_evaluate \
-  --train_input_fp=./train_list.list_csv  \
-  --eval_input_fp=./dev_list.list_csv  \
-  --pretrain_model_name_or_path=./pai-imagebert-base-en/model.ckpt  \
-  --train_batch_size=64  \
-  --num_epochs=20  \
-  --model_dir=./fashionbert_model  \
-  --learning_rate=2e-5  \
-  --vocab_fp=./vocab.txt \
+  --train_input_fp=train_list.list_csv  \
+  --eval_input_fp=dev_list.list_csv  \
+  --pretrain_model_name_or_path=pai-imagebert-base-en  \
+  --input_sequence_length=64  \
+  --train_batch_size=4  \
+  --num_epochs=1  \
+  --model_dir=./fashionbert_model_dir  \
+  --learning_rate=1e-4  \
+  --image_feature_size=131072  \
   --input_schema="image_feature:float:131072,image_mask:int:64,masked_patch_positions:int:5,input_ids:int:64,input_mask:int:64,segment_ids:int:64,masked_lm_positions:int:10,masked_lm_ids:int:10,masked_lm_weights:float:10,nx_sent_labels:int:1"  \
-
-
 
 ```
 
-
 ### 评估fashionbert
-
 
 img2text:
 
@@ -57,11 +55,8 @@ wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/
 wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/fashionbert-fashiongen-patch-eval-txt2img__9d7082f64d0346fea770b66cdba0fcd2
 wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/fashionbert-fashiongen-patch-eval-txt2img__c4aff1da32324da081af6324570c0bda
 wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/fashionbert-fashiongen-patch-eval-txt2img__e928ee31b75940e88f1da64f133d9c4d
-wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/vocab.txt
 wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/fashionbert_pretrain_model_fin.tar.gz
-wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/fashion_bert/pai-imagebert-base-en.tgz
 
-tar -zxf pai-imagebert-base-en.tgz
 tar -zxf fashionbert_pretrain_model_fin.tar.gz
 
 mkdir eval_img2txt eval_txt2img
@@ -76,24 +71,24 @@ python pretrain_main.py \
   --workerGPU=1 \
   --type=img2txt  \
   --mode=predict \
-  --predict_input_fp./eval_img2txt_list.list_csv  \
+  --predict_input_fp=eval_img2txt_list.list_csv  \
   --predict_batch_size=64  \
   --output_dir=./fashionbert_out  \
-  --pretrain_model_name_or_path=./pai-imagebert-base-en/model.ckpt  \
+  --pretrain_model_name_or_path=pai-imagebert-base-en \
+  --image_feature_size=131072  \
   --predict_checkpoint_path=./fashionbert_pretrain_model_fin/model.ckpt-54198  \
   --input_schema="image_feature:float:131072,image_mask:int:64,input_ids:int:64,input_mask:int:64,segment_ids:int:64,nx_sent_labels:int:1,prod_desc:str:1,text_prod_id:str:1,image_prod_id:str:1,prod_img_id:str:1"  \
-  --vocab_fp=./vocab.txt \
 
 python pretrain_main.py \
   --workerGPU=1 \
   --type=txt2img  \
   --mode=predict \
-  --predict_input_fp./eval_txt2img_list.list_csv  \
+  --predict_input_fp=eval_txt2img_list.list_csv  \
   --predict_batch_size=64  \
   --output_dir=./fashionbert_out  \
   --pretrain_model_name_or_path=./pai-imagebert-base-en/model.ckpt  \
   --predict_checkpoint_path=./fashionbert_pretrain_model_fin/model.ckpt-54198  \
-  --vocab_fp=./vocab.txt \
+  --image_feature_size=131072  \
   --input_schema="image_feature:float:131072,image_mask:int:64,input_ids:int:64,input_mask:int:64,segment_ids:int:64,nx_sent_labels:int:1,prod_desc:str:1,text_prod_id:str:1,image_prod_id:str:1,prod_img_id:str:1"  \
 
 ```
