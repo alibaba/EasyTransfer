@@ -28,10 +28,10 @@ The literature has witnessed the success of applying deep Transfer Learning (TL)
 - [Knowledge distillation including vanilla KD, BERT PKD, AdaBERT](https://www.yuque.com/easytransfer/itfpm9/kp1dtx)
 
 # Reference
-Tutorials：[https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/ig3owr](https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/ig3owr)
-ModelZoo：[https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/yh01gk](https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/yh01gk)
-AppZoo：[https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/gcaiqq](https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/gcaiqq)
-API docs：[https://atp-modelzoo.oss-cn-hangzhou.aliyuncs.com/easy_transfer_docs/html/index.html](https://atp-modelzoo.oss-cn-hangzhou.aliyuncs.com/easy_transfer_docs/html/index.html)
+- Tutorials：[https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/ig3owr](https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/ig3owr)
+- ModelZoo：[https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/yh01gk](https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/yh01gk)
+- AppZoo：[https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/gcaiqq](https://yuque.antfin-inc.com/pai-innovative-algo/apx4dp/gcaiqq)
+- API docs：[https://atp-modelzoo.oss-cn-hangzhou.aliyuncs.com/easy_transfer_docs/html/index.html](https://atp-modelzoo.oss-cn-hangzhou.aliyuncs.com/easy_transfer_docs/html/index.html)
 
 
 # Contact Us
