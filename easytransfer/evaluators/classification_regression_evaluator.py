@@ -180,6 +180,25 @@ def classification_eval_metrics(logits, labels, num_labels):
     tf.summary.scalar("weighted_f1", ret_metrics['py_weighted_f1'])
     return metric_dict
 
+def matthew_corr_metrics(logits, labels):
+    predictions = tf.argmax(logits, axis=-1, output_type=tf.int32)
+    # https://en.wikipedia.org/wiki/Matthews_correlation_coefficient
+    tp, tp_op = tf.metrics.true_positives(
+        labels=labels, predictions=predictions)
+    tn, tn_op = tf.metrics.true_negatives(
+        labels=labels, predictions=predictions)
+    fp, fp_op = tf.metrics.false_positives(
+        labels=labels, predictions=predictions)
+    fn, fn_op = tf.metrics.false_negatives(
+        labels=labels, predictions=predictions)
+
+    # Compute Matthew's correlation
+    mcc = tf.div_no_nan(
+        tp * tn - fp * fn,
+        tf.pow((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn), 0.5))
+
+    return {"matthew_corr": (mcc, tf.group(tp_op, tn_op, fp_op, fn_op))}
+
 
 def regression_eval_metrics(logits, labels):
     mse_metric = tf.metrics.mean_squared_error(labels, logits)

@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from .classification_regression_evaluator import classification_eval_metrics, multi_label_eval_metrics, regression_eval_metrics
+from .classification_regression_evaluator import matthew_corr_metrics
 from .comprehension_evaluator import comprehension_eval_metrics
 from .kd_evaluator import teacher_probes_eval_metrics
 from .labeling_evaluator import sequence_labeling_eval_metrics
