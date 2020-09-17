@@ -5,11 +5,17 @@
 
 
 seq_len=128
+
 warmup_ratio = 0.1
+
 weight_decay_ratio=0.01
+
 dropout=0.1
+
 batch_size=[8, 16, 32]
+
 num_epochs=5
+
 learning_rate=[1e-5，3e-5，5e-5]
 
 
