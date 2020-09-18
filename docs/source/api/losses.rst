@@ -1,27 +1,53 @@
 ez\_transfer.losses
 ===========================
 
-loss
+classification\_regression\_loss
 -------------------------------
 
-.. automodule:: ez_transfer.losses.loss
+.. automodule:: easytransfer.losses.classification_regression_loss
     :members:
     :undoc-members:
     :show-inheritance:
 
-sigmoid\_focal\_cross\_entropy
+comprehension\_loss
 ---------------------------------------------------------
 
-.. automodule:: ez_transfer.losses.sigmoid_focal_cross_entropy
+.. automodule:: easytransfer.losses.comprehension_loss
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+kd\_loss
+---------------------------------------------------------
+
+.. automodule:: easytransfer.losses.kd_loss
     :members:
     :undoc-members:
     :show-inheritance:
 
 
-Module contents
----------------
+labeling\_loss
+---------------------------------------------------------
 
-.. automodule:: ez_transfer.losses
+.. automodule:: easytransfer.losses.labeling_loss
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+matching\_loss
+---------------------------------------------------------
+
+.. automodule:: easytransfer.losses.matching_loss
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+pretrain\_loss
+---------------------------------------------------------
+
+.. automodule:: easytransfer.losses.pretrain_loss
     :members:
     :undoc-members:
     :show-inheritance:
