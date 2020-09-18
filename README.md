@@ -7,10 +7,10 @@
 <p align="center"> <b> EasyTransfer is designed to make the development of transfer learning in NLP applications easier. </b> </p>
 <p align="center">
     <a href="https://www.yuque.com/easytransfer/itfpm9/ah0z6o">
-        <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258840-bfe6302e-d934-409d-917c-8eab455675c1.svg#align=left&display=inline&height=24&margin=%5Bobject%20Object%5D&originHeight=20&originWidth=96&size=0&status=done&style=none&width=115">
+        <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258840-bfe6302e-d934-409d-917c-8eab455675c1.svg" height="24">
     </a>
     <a href="https://dsw-dev.data.aliyun.com/#/?fileUrl=https://pai-public-data.oss-cn-beijing.aliyuncs.com/easytransfer/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb">
-        <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258886-ad896af5-b7da-4ca6-8369-4b14c23cb7a3.svg#align=left&display=inline&height=24&margin=%5Bobject%20Object%5D&originHeight=24&originWidth=137&size=0&status=done&style=none&width=137">
+        <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258886-ad896af5-b7da-4ca6-8369-4b14c23cb7a3.svg" height="24">
     </a>
 </p>
 
@@ -20,11 +20,8 @@ The literature has witnessed the success of applying deep Transfer Learning (TL)
 # Main Features
 
 - **Language model pre-training tool:** it supports a comprehensive pre-training tool for users to pre-train language models such as T5 and BERT. Based on the tool, the user can easily train a model to achieve great results in the benchmark leaderboards such as CLUE, GLUE, and SuperGLUE;
-
 - **ModelZoo with rich and high-quality pre-trained models:** supports the Continual Pre-training and Fine-tuning of mainstream LM models such as BERT, ALBERT, RoBERTa, T5, etc. It also supports a multi-modal model FashionBERT developed using the fashion domain data in Alibaba;
-
 - **AppZoo with rich and easy-to-use applications:** supports mainstream NLP applications and those models developed inside of Alibaba, e.g.: HCNN for text matching, and BERT-HAE for MRC.
-
 - **Automatic knowledge distillation:** supports task-adaptive knowledge distillation to distill knowledge from a teacher model to a small task-specific student model. The resulting method is AdaBERT, which uses a neural architecture search method to find a task-specific architecture to compress the original BERT model. The compressed models are 12.7x to 29.3x faster than BERT in inference time and 11.5x to 17.0x smaller in terms of parameter size and with comparable performance.
 - **Easy-to-use and high-performance distributed strategy:** based on the in-house PAI features, it provides easy-to-use and high-performance distributed strategy for multiple CPU/GPU training.
 
@@ -147,9 +144,13 @@ You can find more benchmarks in [https://www.yuque.com/easytransfer/cn/rkm4p7](h
 
 
 # Links
+
 Tutorials：[https://www.yuque.com/easytransfer/itfpm9/qtzvuc](https://www.yuque.com/easytransfer/itfpm9/qtzvuc)
+
 ModelZoo：[https://www.yuque.com/easytransfer/itfpm9/oszcof](https://www.yuque.com/easytransfer/itfpm9/oszcof)
+
 AppZoo：[https://www.yuque.com/easytransfer/itfpm9/ky6hky](https://www.yuque.com/easytransfer/itfpm9/ky6hky)
+
 API docs：[http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_docs/html/index.html](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_docs/html/index.html)
 
 
