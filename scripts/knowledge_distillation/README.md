@@ -55,7 +55,9 @@ $ sh run_distill.sh vanilla teacher_predict
 
 
 最后会生成 `sst2_train_logits.tsv` 文件和 `sst2_dev_logits.tsv` 文件，示例如下：
+
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2467880/1600160899895-0252a715-d785-47c3-9a2a-25611370316d.png#align=left&display=inline&height=361&margin=%5Bobject%20Object%5D&name=image.png&originHeight=361&originWidth=715&size=40695&status=done&style=none&width=715)
+
 ### 1.2 训练Student
 在生成logits文件后，Student通过直接读取logits来进行蒸馏，训练命令如下：
 ```bash
@@ -66,7 +68,9 @@ $ sh run_distill.sh vanilla student_train
 $ sh run_distill.sh vanilla student_predict
 ```
 # 2. Probes知识蒸馏
+
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2467880/1600160899787-1432119f-31d9-4bce-838b-e0662b7a9f3c.png#align=left&display=inline&height=329&margin=%5Bobject%20Object%5D&name=image.png&originHeight=329&originWidth=593&size=131428&status=done&style=none&width=593)
+
 AdaBERT中提出将每一层的输出作为输入，学习相应的Probes来对Student进行蒸馏。本节主要用到了这个方法，Student为同构的Transformer架构。
 
 
@@ -82,6 +86,7 @@ $ sh run_distill.sh probes teacher_train
 $ sh run_distill.sh probes teacher_predict
 ```
 最后会生成 `sst2_train_probes.tsv` 文件和 `sst2_dev_probes.tsv` 文件，示例如下：
+
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2467880/1600160899796-aa9d33dc-7f66-493c-ac7d-855d4ab993b9.png#align=left&display=inline&height=505&margin=%5Bobject%20Object%5D&name=image.png&originHeight=505&originWidth=712&size=141557&status=done&style=none&width=712)
 
 
@@ -99,10 +104,14 @@ AdaBERT算法在目标任务上通过神经架构搜索（NAS）的方法搜索�
 
 
 我们在搜索过程中首先定义如下图所示的神经网络架构：
+
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2467880/1600160899808-3905cdb2-4f52-4fe7-be43-5bace5c3cdd0.png#align=left&display=inline&height=370&margin=%5Bobject%20Object%5D&name=image.png&originHeight=516&originWidth=648&size=58231&status=done&style=none&width=465)
+
 图中每个cell中，除了两个输入节点和一个输出节点，我们考虑3个中间节点。每条进入中间节点的边有10种候选算子：cnn3, cnn5, cnn7, dilated_cnn3, dilated_cnn5, dilated_cnn7, avg_pool, max_pool, identity, zero。我们的目的就是学习架构参数，表明每条边我们应该选取哪种算子，同时表明哪些边应该保留（最终要求每个中间节点只有两条入边）。
       我们通过优化由三部分组成的loss来学习模型和架构参数，我们通过![](https://intranetproxy.alipay.com/skylark/lark/__latex/f32e663520e2eb2c67f0bb880e1d9126.svg#card=math&code=%5Cgamma%2C%20%5Cbeta&height=19&width=26)两个超参数进行平衡：
+      
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2467880/1600160899770-8fbaacba-abbd-4257-849c-ff8c3c649202.png#align=left&display=inline&height=54&margin=%5Bobject%20Object%5D&name=image.png&originHeight=107&originWidth=589&size=15138&status=done&style=none&width=294.5)
+
 其中![](https://intranetproxy.alipay.com/skylark/lark/__latex/ad3dfe9a6599d33a2be41ab39409737c.svg#card=math&code=L_%7BCE%7D&height=18&width=31)是分类任务本身的cross entropy loss，![](https://intranetproxy.alipay.com/skylark/lark/__latex/9ac121f2356e59083285f239c721a8a0.svg#card=math&code=L_%7BKD%7D&height=18&width=33)是每个cell对应的output logits与teacher提供的logits之间的cross entropy，可以理解为知识蒸馏（knowledge distill），![](https://intranetproxy.alipay.com/skylark/lark/__latex/1d48792ae1ab62e8586e4905b480cc6c.svg#card=math&code=L_E&height=18&width=22)是惩罚参数更大推理速度更慢的op以及cell个数的efficiency loss，目的是鼓励更轻量化的神经架构。
       搜索过程中我们轮巡地相对于模型参数和相对于架构参数来最小化上述损失函数，最终记录下架构参数。
       finetune步骤我们根据架构参数导出对应的最优神经架构，根据该结构建立计算图描述轻量化的模型，进行finetune。
@@ -158,6 +167,7 @@ wemb.npy
 $ sh run_adabert.sh finetune
 ```
 最后看到AdaBERT结果输出：
+
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2467880/1600160899793-6e5a97ae-03ba-418d-aeb1-d3fbb6680e65.png#align=left&display=inline&height=126&margin=%5Bobject%20Object%5D&name=image.png&originHeight=126&originWidth=689&size=39621&status=done&style=none&width=689)
 
 
