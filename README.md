@@ -30,7 +30,13 @@ The literature has witnessed the success of applying deep Transfer Learning (TL)
 
 # Installation
 
-You can setup from the source：
+You can either install from pip 
+
+```bash
+$ pip install easytransfer
+```
+
+or setup from the source：
 
 ```bash
 $ git clone https://github.com/alibaba/EasyTransfer.git
@@ -75,7 +81,7 @@ train_reader = CSVReader(input_glob=app.train_input_fp, is_training=True, batch_
 eval_reader = CSVReader(input_glob=app.eval_input_fp, is_training=False, batch_size=app.eval_batch_size)              
 app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
 ```
-You can find more details or play with codes in our Jupyter/Notebook [PAI-DSW](https://console.pai.alibaba-inc.com/index?projectId=&regionId=inner#/notebook). 
+You can find more details or play with codes in our Jupyter/Notebook [PAI-DSW](https://dsw-dev.data.aliyun.com/#/?fileUrl=https://pai-public-data.oss-cn-beijing.aliyuncs.com/easytransfer/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb). 
 
 
 You can also use AppZoo Command Line Tools to quickly train an App model. Take text classification on SST-2 dataset as an example. First you can download the [train.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/train.tsv), [dev.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/dev.tsv) and [test.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/test.tsv), then start training: 
