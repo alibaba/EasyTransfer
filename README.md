@@ -1,5 +1,3 @@
-# A Brief Intro to EasyTransfer
-
 <p align="center">
     <br>
     <img src="https://cdn.nlark.com/yuque/0/2020/png/2480469/1600401425964-828d6ffe-90d7-4cda-9b76-b9f17e35f11f.png#align=left&display=inline&height=188&margin=%5Bobject%20Object%5D&name=image.png&originHeight=608&originWidth=649&size=41423&status=done&style=none&width=201" width="200"/>
@@ -20,11 +18,15 @@
 The literature has witnessed the success of applying deep Transfer Learning (TL) for many NLP applications, yet it not easy to build a simple and easy-to-use TL toolkit to achieve this goal. To bridge this gap, EasyTransfer is designed to make it easy to design deep TL for NLP applications. It was developed in Alibaba in early 2017, and has been in the major BUs in Alibaba group and achieved very good results in 20+ business scenarios. It supports the mainstream pre-trained ModelZoo, including pre-trained language models (PLMs) and multi-modal models on the PAI platform, integrates the SOTA model for the mainstream NLP applications in AppZoo, and supports knowledge distillation for PLMs. The toolkit is convenient for users to quickly start model training, evaluation, offline prediction, and online deployment. It provides rich APIs to make the development of NLP and transfer learning easier.
 
 # Main Features
-- **Language model pre-training tool: **it supports a comprehensive pre-training tool for users to pre-train language models such as T5 and BERT. Based on the tool, the user can easily train a model to achieve great results in the benchmark leaderboards such as CLUE, GLUE, and SuperGLUE;
-- **ModelZoo with rich and high-quality pre-trained models: **supports the Continual Pre-training and Fine-tuning of mainstream LM models such as BERT, ALBERT, RoBERTa, T5, etc. It also supports a multi-modal model FashionBERT developed using the fashion domain data in Alibaba;
+
+- **Language model pre-training tool:** it supports a comprehensive pre-training tool for users to pre-train language models such as T5 and BERT. Based on the tool, the user can easily train a model to achieve great results in the benchmark leaderboards such as CLUE, GLUE, and SuperGLUE;
+
+- **ModelZoo with rich and high-quality pre-trained models:** supports the Continual Pre-training and Fine-tuning of mainstream LM models such as BERT, ALBERT, RoBERTa, T5, etc. It also supports a multi-modal model FashionBERT developed using the fashion domain data in Alibaba;
+
 - **AppZoo with rich and easy-to-use applications:** supports mainstream NLP applications and those models developed inside of Alibaba, e.g.: HCNN for text matching, and BERT-HAE for MRC.
-- **Automatic knowledge distillation: **supports task-adaptive knowledge distillation to distill knowledge from a teacher model to a small task-specific student model. The resulting method is AdaBERT, which uses a neural architecture search method to find a task-specific architecture to compress the original BERT model. The compressed models are 12.7x to 29.3x faster than BERT in inference time and 11.5x to 17.0x smaller in terms of parameter size and with comparable performance.
-- **Easy-to-use and high-performance distributed strategy: **based on the in-house PAI features, it provides easy-to-use and high-performance distributed strategy for multiple CPU/GPU training.
+
+- **Automatic knowledge distillation:** supports task-adaptive knowledge distillation to distill knowledge from a teacher model to a small task-specific student model. The resulting method is AdaBERT, which uses a neural architecture search method to find a task-specific architecture to compress the original BERT model. The compressed models are 12.7x to 29.3x faster than BERT in inference time and 11.5x to 17.0x smaller in terms of parameter size and with comparable performance.
+- **Easy-to-use and high-performance distributed strategy:** based on the in-house PAI features, it provides easy-to-use and high-performance distributed strategy for multiple CPU/GPU training.
 
 # Architecture
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/2480469/1600310258839-04837b68-ef37-449d-8ff4-02dbd8dcef9e.png#align=left&display=inline&height=357&margin=%5Bobject%20Object%5D&name=image.png&originHeight=713&originWidth=1492&size=182794&status=done&style=none&width=746)
