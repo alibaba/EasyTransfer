@@ -58,7 +58,7 @@ from easytransfer.evaluators import classification_eval_metrics
 class TextClassification(base_model):
     def __init__(self, **kwargs):
         super(TextClassification, self).__init__(**kwargs)
-		self.pretrained_model_name = "google-bert-base-en"
+	self.pretrained_model_name = "google-bert-base-en"
         self.num_labels = 2
         
     def build_logits(self, features, mode=None):
