@@ -47,7 +47,7 @@ This repo is tested on Python3.6/2.7, tensorflow 1.12.3
 
 
 # Quick Start
-Now let's show how to use 30 lines to build bert-based text classification. 
+Now let's show how to use just 30 lines of code to build a text classification model based on BERT. 
 
 ```python
 from easytransfer import base_model, layers, model_zoo, preprocessors
@@ -76,12 +76,11 @@ class TextClassification(base_model):
         return classification_eval_metrics(logits, labels, self.num_labels)
         
 app = TextClassification()
-
 train_reader = CSVReader(input_glob=app.train_input_fp, is_training=True, batch_size=app.train_batch_size)
 eval_reader = CSVReader(input_glob=app.eval_input_fp, is_training=False, batch_size=app.eval_batch_size)              
 app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
 ```
-You can find more details or play with codes in our Jupyter/Notebook [PAI-DSW](https://dsw-dev.data.aliyun.com/#/?fileUrl=https://pai-public-data.oss-cn-beijing.aliyuncs.com/easytransfer/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb). 
+You can find more details or play with the code in our Jupyter/Notebook [PAI-DSW](https://dsw-dev.data.aliyun.com/#/?fileUrl=https://pai-public-data.oss-cn-beijing.aliyuncs.com/easytransfer/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb). 
 
 
 You can also use AppZoo Command Line Tools to quickly train an App model. Take text classification on SST-2 dataset as an example. First you can download the [train.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/train.tsv), [dev.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/dev.tsv) and [test.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/test.tsv), then start training: 
