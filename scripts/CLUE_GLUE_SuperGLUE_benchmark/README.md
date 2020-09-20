@@ -1,3 +1,4 @@
+CLUE
 # EasyTransfer基准评测
 
 # 评测方法
