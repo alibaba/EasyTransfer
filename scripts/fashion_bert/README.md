@@ -3,7 +3,7 @@
 ## Input Schema
 ``` bash 
 image_feature: image patch features, (image_feature size) = (patch_feature size) * (image_patch number). For example, given on image, we equally split it into 64 patches, and for each patch we extract 2048 embedding. Thus, the image_feature size is equal to 131072(2048*64) in our paper.
-image_mask: image mask is the segment ids, which is used to distinct from text token input. We use 1 to indicate image patch input in our paper.
+image_mask: image mask to indicate there exists padding image_feature(s). In FashionBERT, all image are equally splitted into patches with same number. Thus, image_mask are 1.
 masked_patch_positions: the masked position of the patch sequence, which is randomly selected from the patch sequence.
 input_ids: input tokens ids, which is the same with BERT.
 input_mask: input mask of tokens, which is the same with BERT.
@@ -150,7 +150,7 @@ Taking the Image2Text Task as example:
 1. From the valid dataset, we randomly select 1000 products. For one product, we regard the image as the QUERY and regard its text as the GROUND TRUTH.
 2. For one selected product, we randomly sample 100 other products under its sub-category. These texts from these sampled products are composed of the negative samples. Finally, for the image query of the selected product, we collect one ground truth text and 100 negative texts.
 3. For one selected product, we score each <Text, Image> pair, including the ground truth text and sampled texts, with FashionBERT. We finally rank the texts of different products according the scores for each selected image query.
-4. According to the ranking, calculate the metrics.
+4.  According to the ranking, calculate the metrics.
 
 ```bash
 # Eval Websites
