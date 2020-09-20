@@ -12,7 +12,7 @@ Welcome to easy_transfer's documentation!
    :caption: Tutorials
 
    tutorials/install
-   tutorials/quick_start
+   tutorials/documentation
 
 
 .. toctree::
@@ -28,7 +28,6 @@ Welcome to easy_transfer's documentation!
    api/layers
    api/losses
    api/optimizers
-   api/utils
 
 
 
