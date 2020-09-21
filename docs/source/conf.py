@@ -212,6 +212,6 @@ html_theme_options = {
     'logo_only': True,
 }
 
-html_logo = '_static/img/ez_transfer_logo.jpg'
+html_logo = '_static/img/ez_transfer_logo.png'
 html_show_sourcelink = False
 autodoc_member_order = 'bysource'
