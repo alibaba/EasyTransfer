@@ -163,3 +163,8 @@ API docs：[http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_docs/
 Scan the following QR codes to join Dingtalk discussion group. The group discussions are most in Chinese, but English is also welcomed.
 
 <img src="https://cdn.nlark.com/yuque/0/2020/png/2480469/1600310258842-d7121051-32f1-494b-a7a5-a35ede74b6c4.png#align=left&display=inline&height=352&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1178&originWidth=1016&size=312154&status=done&style=none&width=304" width="300"/>
+
+Also we can scan the following QR code to join wechat discussion group.
+
+<img src="https://cdn.nlark.com/yuque/0/2020/jpeg/2556223/1600700454586-a48630a0-b3dd-448b-ad3c-16dace1d93b9.jpeg#align=left&display=inline&height=352&margin=%5Bobject%20Object%5D&name=IMG_2106.JPG&originHeight=1178&originWidth=1016&size=312154&status=done&style=none&width=304" width="300"/>
+
