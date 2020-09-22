@@ -63,21 +63,21 @@ class Config(object):
         if self.mode == 'train' or self.mode == "train_and_evaluate" \
                 or self.mode == "train_and_evaluate_on_the_fly" or self.mode == "train_on_the_fly":
 
-            self.enable_xla = bool(config_json["train_config"]['distribution_config'].get(
+            self.enable_xla = bool(config_json["train_config"].get('distribution_config', {}).get(
                 'enable_xla', False))
 
-            self.enable_auto_mixed_precision = bool(config_json["train_config"]['distribution_config'].get(
+            self.enable_auto_mixed_precision = bool(config_json["train_config"].get('distribution_config', {}).get(
                 'enable_auto_mixed_precision', False))
 
             self.distribution_strategy = str(
-                config_json["train_config"]['distribution_config'].get("distribution_strategy", None))
-            self.pull_evaluation_in_multiworkers_training = bool(config_json["train_config"]['distribution_config'].get(
+                config_json["train_config"].get('distribution_config', {}).get("distribution_strategy", None))
+            self.pull_evaluation_in_multiworkers_training = bool(config_json["train_config"].get('distribution_config', {}).get(
                 'pull_evaluation_in_multiworkers_training', False))
 
-            self.num_accumulated_batches = int(config_json["train_config"]['distribution_config'].get(
+            self.num_accumulated_batches = int(config_json["train_config"].get('distribution_config', {}).get(
                 'num_accumulated_batches', 1))
 
-            self.num_model_replica = int(config_json["train_config"]['distribution_config'].get(
+            self.num_model_replica = int(config_json["train_config"].get('distribution_config', {}).get(
                 'num_model_replica', 1))
 
             # optimizer
@@ -121,7 +121,7 @@ class Config(object):
             if self.mode == 'train_and_evaluate_on_the_fly' or self.mode == 'train_on_the_fly':
                 self.sequence_length = int(config_json['preprocess_config']['sequence_length'])
                 self.first_sequence = str(config_json['preprocess_config']['first_sequence'])
-                self.second_sequence = str(config_json['preprocess_config']['second_sequence'])
+                self.second_sequence = str(config_json['preprocess_config'].get('second_sequence', None))
                 self.label_name = str(config_json['preprocess_config']['label_name'])
                 self.label_enumerate_values = config_json['preprocess_config'].get('label_enumerate_values', None)
                 self.append_feature_columns = config_json['preprocess_config'].get('append_feature_columns', None)
@@ -168,29 +168,29 @@ class Config(object):
 
             if self.mode == 'predict_on_the_fly':
                 self.first_sequence = config_json['preprocess_config']['first_sequence']
-                self.second_sequence = config_json['preprocess_config']['second_sequence']
+                self.second_sequence = config_json['preprocess_config'].get('second_sequence', None)
                 self.sequence_length = config_json['preprocess_config']['sequence_length']
                 self.max_predictions_per_seq = config_json['preprocess_config'].get('max_predictions_per_seq', None)
 
             self.predict_batch_size = config_json['predict_config']['predict_batch_size']
 
-            if config_json['preprocess_config']['output_schema'] == "bert_finetune":
+            if config_json['preprocess_config'].get('output_schema', None) == "bert_finetune":
                 self.output_schema = "input_ids,input_mask,segment_ids,label_id"
 
-            elif config_json['preprocess_config']['output_schema'] == "bert_pretrain":
+            elif config_json['preprocess_config'].get('output_schema', None) == "bert_pretrain":
                 self.output_schema = "input_ids,input_mask,segment_ids,masked_lm_positions,masked_lm_ids,masked_lm_weights"
 
-            elif config_json['preprocess_config']['output_schema'] == "bert_predict":
+            elif config_json['preprocess_config'].get('output_schema', None) == "bert_predict":
                 self.output_schema = "input_ids,input_mask,segment_ids"
             else:
-                self.output_schema = config_json['preprocess_config']['output_schema']
+                self.output_schema = config_json['preprocess_config'].get('output_schema', None)
 
             self.model_config = config_json['model_config']
             for key, val in config_json['model_config'].items():
                 setattr(self, key, val)
 
             self.predict_input_fp = config_json['predict_config']['predict_input_fp']
-            self.predict_output_fp = config_json['predict_config']['predict_output_fp']
+            self.predict_output_fp = config_json['predict_config'].get('predict_output_fp', None)
 
         elif self.mode == 'export':
             self.checkpoint_path = config_json['export_config']['checkpoint_path']
@@ -254,8 +254,8 @@ class EzTransEstimator(object):
             else:
                 tf.logging.info("***********Disable AUTO_MIXED_PRECISION***********")
 
-            NCCL_MAX_NRINGS = "4"
-            NCCL_MIN_NRINGS = "4"
+            NCCL_MAX_NRINGS = "1"
+            NCCL_MIN_NRINGS = "1"
             TF_JIT_PROFILING = 'False'
             PAI_ENABLE_HLO_DUMPER = 'False'
             os.environ['PAI_ENABLE_HLO_DUMPER'] = PAI_ENABLE_HLO_DUMPER
@@ -267,7 +267,6 @@ class EzTransEstimator(object):
             tf.logging.info("***********NCCL_MIN_NRINGS {}***********".format(NCCL_MIN_NRINGS))
             tf.logging.info("***********TF_JIT_PROFILING {}***********".format(TF_JIT_PROFILING))
             tf.logging.info("***********PAI_ENABLE_HLO_DUMPER {}***********".format(PAI_ENABLE_HLO_DUMPER))
-
             self.strategy = None
             if self.config.num_gpus >= 1 and self.config.num_workers >= 1 and \
                     (self.config.distribution_strategy == "ExascaleStrategy" or
@@ -298,9 +297,12 @@ class EzTransEstimator(object):
                 elif self.config.distribution_strategy == "CollectiveAllReduceStrategy":
                     tf.logging.info("*****************Using CollectiveAllReduceStrategy*********************")
                     if FLAGS.usePAI:
+                        cross_tower_ops_type = "default"
+                        tf.logging.info("*****************cross_tower_ops_type is {}*********************".format(
+                            cross_tower_ops_type))
                         self.strategy = tf.contrib.distribute.CollectiveAllReduceStrategy(
                             num_gpus_per_worker=self.config.num_gpus,
-                            cross_tower_ops_type='default',
+                            cross_tower_ops_type=cross_tower_ops_type,
                             all_dense=True,
                             iter_size=self.config.num_accumulated_batches)
                     else:
@@ -335,20 +337,23 @@ class EzTransEstimator(object):
                     self.config.distribution_strategy == "WhaleStrategy":
 
                 if FLAGS.usePAI:
-                    import pai
-                    worker_hosts = self.config.worker_hosts.split(',')
                     tf.logging.info("***********Job Name is {}***********".format(self.config.job_name))
                     tf.logging.info("***********Task Index is {}***********".format(self.config.task_index))
                     tf.logging.info("***********Worker Hosts is {}***********".format(self.config.worker_hosts))
-                    pai.distribute.set_tf_config(self.config.job_name,
-                                                 self.config.task_index,
-                                                 worker_hosts,
-                                                 has_evaluator=self.config.pull_evaluation_in_multiworkers_training)
 
                 tf.logging.info("*****************Using WhaleStrategy*********************")
-                os.environ["WHALE_COMMUNICATION_SPARSE_AS_DENSE"] = "True"
-                os.environ["WHALE_COMMUNICATION_NUM_COMMUNICATORS"] = "2"
-                os.environ["WHALE_COMMUNICATION_NUM_SPLITS"] = "8"
+                WHALE_COMMUNICATION_SPARSE_AS_DENSE = "True"
+                WHALE_COMMUNICATION_NUM_COMMUNICATORS = "1"
+                WHALE_COMMUNICATION_NUM_SPLITS = "1"
+                WHALE_UNBALANCED_IO_SLICING = "True"
+                os.environ["WHALE_COMMUNICATION_SPARSE_AS_DENSE"] = WHALE_COMMUNICATION_SPARSE_AS_DENSE
+                os.environ["WHALE_COMMUNICATION_NUM_COMMUNICATORS"] = WHALE_COMMUNICATION_NUM_COMMUNICATORS
+                os.environ["WHALE_COMMUNICATION_NUM_SPLITS"] = WHALE_COMMUNICATION_NUM_SPLITS
+                os.environ["WHALE_UNBALANCED_IO_SLICING"] = WHALE_UNBALANCED_IO_SLICING
+                tf.logging.info("***********WHALE_COMMUNICATION_SPARSE_AS_DENSE {}***********".format(WHALE_COMMUNICATION_SPARSE_AS_DENSE))
+                tf.logging.info("***********WHALE_COMMUNICATION_NUM_COMMUNICATORS {}***********".format(WHALE_COMMUNICATION_NUM_COMMUNICATORS))
+                tf.logging.info("***********WHALE_COMMUNICATION_NUM_SPLITS {}***********".format(WHALE_COMMUNICATION_NUM_SPLITS))
+                tf.logging.info("***********WHALE_UNBALANCED_IO_SLICING {}***********".format(WHALE_UNBALANCED_IO_SLICING))
                 global_batch_size = self.config.train_batch_size * self.config.num_accumulated_batches * self.config.num_model_replica
 
             elif self.config.num_gpus == 1 and self.config.num_workers == 1:
@@ -399,6 +404,7 @@ class EzTransEstimator(object):
             tf.logging.info("keep checkpoint max: {}".format(self.config.keep_checkpoint_max))
             tf.logging.info("warmup ratio: {}".format(self.config.warmup_ratio))
             tf.logging.info("gradient clip: {}".format(self.config.gradient_clip))
+            tf.logging.info("clip norm value: {}".format(self.config.clip_norm_value))
             tf.logging.info("log step count steps: {}".format(self.config.log_step_count_steps))
 
             if self.config.distribution_strategy != "WhaleStrategy":
@@ -416,7 +422,10 @@ class EzTransEstimator(object):
                         model_fn=self._build_model_fn(),
                         model_dir=self.config.model_dir,
                         num_model_replica=self.config.num_model_replica,
-                        num_accumulated_batches=self.config.num_accumulated_batches)
+                        num_accumulated_batches=self.config.num_accumulated_batches,
+                        keep_checkpoint_max=self.config.keep_checkpoint_max,
+                        save_checkpoints_steps=self.config.save_steps,
+                        task_index=self.config.task_index)
                 except:
                     raise NotImplementedError("WhaleStrategy doesn't work well")
 
@@ -568,7 +577,6 @@ class EzTransEstimator(object):
         tf.estimator.train_and_evaluate(self.estimator,
                                         train_spec=train_spec,
                                         eval_spec=eval_spec)
-
 
     def run_train(self, reader):
         self.estimator.train(input_fn=reader.get_input_fn(),
