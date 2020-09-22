@@ -89,7 +89,7 @@ class TFRecordReader(Reader):
 
 
 class BundleTFRecordReader(TFRecordReader):
-    def __init__(self, input_glob, batch_size, worker_hosts, task_index, is_training=False, **kwargs):
+    def __init__(self, input_glob, batch_size, worker_hosts, task_index, distribution_strategy, is_training=False, **kwargs):
         super(BundleTFRecordReader, self).__init__(input_glob, batch_size, is_training, **kwargs)
 
         self.input_fps = []
@@ -101,16 +101,26 @@ class BundleTFRecordReader(TFRecordReader):
                 self.input_fps.append(line)
         self.worker_hosts = worker_hosts
         self.task_index = task_index
+        self.distribution_strategy = distribution_strategy
+        tf.logging.info("***********Distribution Strategy In Reader is {}***********".format(self.distribution_strategy))
+        tf.logging.info("***********Task Index In Reader is {}***********".format(self.task_index))
+        tf.logging.info("***********Worker Hosts In Reader is {}***********".format(self.worker_hosts))
 
     def get_input_fn(self):
         def input_fn():
 
             if self.is_training:
                 d = tf.data.Dataset.from_tensor_slices(tf.constant(self.input_fps))
-                d = d.shard(len(self.worker_hosts.split(',')), self.task_index)
+                if self.distribution_strategy != "WhaleStrategy":
+                    d = d.shard(len(self.worker_hosts.split(',')), self.task_index)
                 d = d.repeat()
                 d = d.shuffle(buffer_size=len(self.input_fps))
+                """
+                def passthrough(path):
+                    return tf.Print(path, [path], message='Path=')
 
+                d = d.map(passthrough, num_parallel_calls=1)
+                """
                 cycle_length = min(4, len(self.input_fps))
                 d = d.apply(
                     tf.data.experimental.parallel_interleave(
@@ -119,6 +129,9 @@ class BundleTFRecordReader(TFRecordReader):
                         cycle_length=cycle_length))
 
                 d = d.shuffle(buffer_size=self.shuffle_buffer_size)
+
+
+
             else:
                 d = tf.data.TFRecordDataset(self.input_fps)
                 # Since we evaluate for a fixed number of steps we don't want to encounter
