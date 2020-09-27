@@ -17,6 +17,9 @@
 
 The literature has witnessed the success of applying deep Transfer Learning (TL) for many real-world NLP applications, yet it is not easy to build an easy-to-use TL toolkit to achieve such a goal. To bridge this gap, EasyTransfer is designed to facilitate users leveraging deep TL for NLP applications at ease. It was developed in Alibaba in early 2017, and has been used in the major BUs in Alibaba group and achieved very good results in 20+ business scenarios. It supports the mainstream pre-trained ModelZoo, including pre-trained language models (PLMs) and multi-modal models on the PAI platform, integrates the SOTA models for the mainstream NLP applications in AppZoo, and supports knowledge distillation for PLMs. EasyTransfer is very convenient for users to quickly start model training, evaluation, offline prediction, and online deployment. It also provides rich APIs to make the development of NLP and transfer learning easier.
 
+# CLUE start
+-[CLUE项目](https://github.com/CLUEbenchmark/CLUE)  
+-[快速开始](https://github.com/CLUEbenchmark/EasyTransfer/blob/add_clue_quick_start/clue_quick_start.ipynb)
 # Main Features
 
 - **Language model pre-training tool:** it supports a comprehensive pre-training tool for users to pre-train language models such as T5 and BERT. Based on the tool, the user can easily train a model to achieve great results in the benchmark leaderboards such as CLUE, GLUE, and SuperGLUE;
