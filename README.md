@@ -9,7 +9,7 @@
     <a href="https://www.yuque.com/easytransfer/itfpm9/ah0z6o">
         <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258840-bfe6302e-d934-409d-917c-8eab455675c1.svg" height="24">
     </a>
-    <a href="https://dsw-dev.data.aliyun.com/#/?fileUrl=https://raw.githubusercontent.com/alibaba/EasyTransfer/master/samples/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb">
+    <a href="https://dsw-dev.data.aliyun.com/#/?fileUrl=https://raw.githubusercontent.com/alibaba/EasyTransfer/master/examples/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb">
         <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258886-ad896af5-b7da-4ca6-8369-4b14c23cb7a3.svg" height="24">
     </a>
 </p>
@@ -83,7 +83,7 @@ train_reader = CSVReader(input_glob=app.train_input_fp, is_training=True, batch_
 eval_reader = CSVReader(input_glob=app.eval_input_fp, is_training=False, batch_size=app.eval_batch_size)              
 app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
 ```
-You can find more details or play with the code in our Jupyter/Notebook [PAI-DSW](https://dsw-dev.data.aliyun.com/#/?fileUrl=https://raw.githubusercontent.com/alibaba/EasyTransfer/master/samples/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb). 
+You can find more details or play with the code in our Jupyter/Notebook [PAI-DSW](https://dsw-dev.data.aliyun.com/#/?fileUrl=https://raw.githubusercontent.com/alibaba/EasyTransfer/master/examples/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb). 
 
 
 You can also use AppZoo Command Line Tools to quickly train an App model. Take text classification on SST-2 dataset as an example. First you can download the [train.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/train.tsv), [dev.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/dev.tsv) and [test.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/test.tsv), then start training: 
