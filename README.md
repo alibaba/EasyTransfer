@@ -17,9 +17,7 @@
 
 The literature has witnessed the success of applying deep Transfer Learning (TL) for many real-world NLP applications, yet it is not easy to build an easy-to-use TL toolkit to achieve such a goal. To bridge this gap, EasyTransfer is designed to facilitate users leveraging deep TL for NLP applications at ease. It was developed in Alibaba in early 2017, and has been used in the major BUs in Alibaba group and achieved very good results in 20+ business scenarios. It supports the mainstream pre-trained ModelZoo, including pre-trained language models (PLMs) and multi-modal models on the PAI platform, integrates the SOTA models for the mainstream NLP applications in AppZoo, and supports knowledge distillation for PLMs. EasyTransfer is very convenient for users to quickly start model training, evaluation, offline prediction, and online deployment. It also provides rich APIs to make the development of NLP and transfer learning easier.
 
-# CLUE start
--[CLUE项目](https://github.com/CLUEbenchmark/CLUE)  
--[快速开始](https://github.com/CLUEbenchmark/EasyTransfer/blob/add_clue_quick_start/clue_quick_start.ipynb)
+
 # Main Features
 
 - **Language model pre-training tool:** it supports a comprehensive pre-training tool for users to pre-train language models such as T5 and BERT. Based on the tool, the user can easily train a model to achieve great results in the benchmark leaderboards such as CLUE, GLUE, and SuperGLUE;
@@ -85,7 +83,6 @@ app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
 ```
 You can find more details or play with the code in our Jupyter/Notebook [PAI-DSW](https://dsw-dev.data.aliyun.com/#/?fileUrl=https://raw.githubusercontent.com/alibaba/EasyTransfer/master/examples/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb). 
 
-
 You can also use AppZoo Command Line Tools to quickly train an App model. Take text classification on SST-2 dataset as an example. First you can download the [train.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/train.tsv), [dev.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/dev.tsv) and [test.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/test.tsv), then start training: 
 
 ```bash
@@ -120,6 +117,7 @@ $ easy_transfer_app --mode predict \
 To learn more about the usage of AppZoo, please refer to our [documentation](https://www.yuque.com/easytransfer/itfpm9/ky6hky).
 
 
+
 # Tutorials
 
 - [PAI-ModelZoo (20+ pretrained models)](https://www.yuque.com/easytransfer/itfpm9/geiy58)
@@ -149,6 +147,8 @@ To learn more about the usage of AppZoo, please refer to our [documentation](htt
 
 
 You can find more benchmarks in [https://www.yuque.com/easytransfer/cn/rkm4p7](https://www.yuque.com/easytransfer/itfpm9/rkm4p7)
+
+Here is the CLUE quick start [notebook](https://github.com/CLUEbenchmark/EasyTransfer/blob/add_clue_quick_start/clue_quick_start.ipynb)
 
 
 # Links
