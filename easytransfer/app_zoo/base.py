@@ -66,11 +66,56 @@ class ApplicationModel(base_model):
                                       input_schema=self.config.input_schema,
                                       batch_size=self.config.eval_batch_size)
 
-        self.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
+        if hasattr(self.config, "export_best_checkpoint") and self.config.export_best_checkpoint:
+            tf.logging.info("First train, then search for best checkpoint...")
+            self.run_train(reader=train_reader)
 
-        # Export the last checkpoints to saved_model
-        try:
+            ckpts = set()
+            with tf.gfile.GFile(os.path.join(self.config.model_dir, "checkpoint"), mode='r') as reader:
+                for line in reader:
+                    line = line.strip()
+                    line = line.replace("oss://", "")
+                    ckpts.add(
+                        int(line.split(":")[1].strip().replace("\"", "").split("/")[-1].replace("model.ckpt-", "")))
+
+            best_score = float('-inf')
+            best_ckpt = None
+            best_eval_results = None
+            best_metric_name = self.config.export_best_checkpoint_metric
+            eval_results_list = list()
+            for ckpt in sorted(ckpts):
+                checkpoint_path = os.path.join(self.config.model_dir, "model.ckpt-" + str(ckpt))
+                eval_results = self.run_evaluate(reader=eval_reader, checkpoint_path=checkpoint_path)
+                eval_results.pop('global_step')
+                eval_results.pop('loss')
+                score = eval_results[best_metric_name]
+                _score = -1 * score if self.config.export_best_checkpoint_metric == "mse" else score
+                if _score > best_score:
+                    best_ckpt = ckpt
+                    best_score = _score
+                    best_eval_results = eval_results
+                tf.logging.info("Ckpt {} 's {}: {:.4f}; Best ckpt {} 's {}: {:.4f}".format(
+                    ckpt, best_metric_name, score, best_ckpt, best_metric_name, best_score))
+                eval_results_list.append((ckpt, eval_results))
+            for ckpt, eval_results in eval_results_list:
+                tf.logging.info("Checkpoint-%d: " % ckpt)
+                for metric_name, score in eval_results.items():
+                    tf.logging.info("\t{}: {:.4f}".format(metric_name, score))
+            tf.logging.info("Best checkpoint: {}".format(best_ckpt))
+            for metric_name, score in best_eval_results.items():
+                tf.logging.info("\t{}: {:.4f}".format(metric_name, score))
+
+            # Export best checkpoints to saved_model
+            checkpoint_path = os.path.join(self.config.model_dir, "model.ckpt-" + str(best_ckpt))
+
+        else:
+            self.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
+
+            # Export the last checkpoints to saved_model
             checkpoint_path = tf.train.latest_checkpoint(self.config.model_dir, latest_filename=None)
+
+        try:
+            tf.logging.info("Export checkpoint {}".format(checkpoint_path))
             self.config.export_dir_base = self.config.model_dir
             self.config.checkpoint_path = checkpoint_path
             self.config.input_tensors_schema = self.get_input_tensor_schema()

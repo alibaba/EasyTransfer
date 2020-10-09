@@ -227,6 +227,23 @@ class AppConfig(Config):
         if "init_checkpoint_path" in user_param_dict:
             setattr(self, "init_checkpoint_path", user_param_dict["init_checkpoint_path"])
 
+        if "export_best_checkpoint" in user_param_dict:
+            assert user_param_dict["export_best_checkpoint"].lower() in ["true", "false"]
+            if user_param_dict["export_best_checkpoint"].lower() == "true":
+                setattr(self, "export_best_checkpoint", True)
+            else:
+                setattr(self, "export_best_checkpoint", False)
+
+        if "export_best_checkpoint_metric" in user_param_dict:
+            setattr(self, "export_best_checkpoint_metric", user_param_dict["export_best_checkpoint_metric"])
+        else:
+            if flags.modelName.startswith("text_classify"):
+                setattr(self, "export_best_checkpoint_metric", "py_accuracy")
+            elif flags.modelName.startswith("text_match") and label_enumerate_values is None:
+                setattr(self, "export_best_checkpoint_metric", "mse")
+            else:
+                setattr(self, "export_best_checkpoint_metric", "accuracy")
+
         return config_json
 
     def build_evaluate_config(self, flags):
