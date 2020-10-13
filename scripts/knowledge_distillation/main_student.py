@@ -49,8 +49,6 @@ class StudentNetwork(base_model):
         else:
             teacher_logits, input_ids, input_mask, segment_ids = preprocessor(features)
             label_ids = None
-        import pdb
-        pdb.set_trace()
 
         teacher_n_layers = int(teacher_logits.shape[1]) / self.config.num_labels - 1
         self.teacher_logits = [teacher_logits[:, i * self.config.num_labels: (i + 1) * self.config.num_labels]
