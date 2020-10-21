@@ -1,0 +1,22 @@
+{
+    "preprocess_config": {
+      "input_schema": "text1:str:1,text2:str:1,domain:str:1,label:str:1",
+      "first_sequence": "text1",
+      "second_sequence": "text2",
+      "sequence_length": 128,
+      "label_name": "label",
+      "output_schema": null,
+      "label_enumerate_values": "entailment,neutral,contradiction",
+      "append_feature_columns": "text1,text2,domain,label"
+    },
+    "model_config": {
+      "pretrain_model_name_or_path": "google-bert-base-en",
+      "num_labels": 3
+    },
+    "predict_config": {
+      "predict_checkpoint_path": "oss://pai-wcy/easytransfer/model/google-bert-base-en/model.ckpt",
+      "predict_input_fp": "mnli_train.tsv",
+      "predict_batch_size": 32,
+      "predict_output_fp": null
+    }
+  }
