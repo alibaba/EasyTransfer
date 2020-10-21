@@ -169,5 +169,5 @@ Scan the following QR codes to join Dingtalk discussion group. The group discuss
 
 Also we can scan the following QR code to join wechat discussion group.
 
-<img src="https://cdn.nlark.com/yuque/0/2020/jpeg/2556223/1600700454586-a48630a0-b3dd-448b-ad3c-16dace1d93b9.jpeg#align=left&display=inline&height=352&margin=%5Bobject%20Object%5D&name=IMG_2106.JPG&originHeight=1178&originWidth=1016&size=312154&status=done&style=none&width=304" width="300"/>
+<img src="https://intranetproxy.alipay.com/skylark/lark/0/2020/jpeg/226643/1603306190699-56be6895-1287-42e3-b8a7-f957b1a4d7b7.jpeg#align=left&display=inline&height=352&margin=%5Bobject%20Object%5D&name=IMG_2129.JPG&originHeight=1178&originWidth=1016&size=312154&status=done&style=none&width=304" width="300"/>
 
