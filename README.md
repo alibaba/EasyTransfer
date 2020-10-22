@@ -131,7 +131,7 @@ To learn more about the usage of AppZoo, please refer to our [documentation](htt
 
 
 
-# CLUE Benchmark
+# [CLUE Benchmark](https://www.cluebenchmarks.com/)
 
 
 
