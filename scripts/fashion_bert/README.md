@@ -135,10 +135,13 @@ The procedure is as following:
 3. Now, we obtain the train and valid <Image, Text> pairs, which include both positive and negative pairs.
 
 4. Extract Text and Image Features
-   1. Text: The procedure of text features extraction is exactly same to that of the BERT model
+   1. Text: The procedure of text features extraction is exactly same to that of the BERT model. refer **[google create pretrain data](https://github.com/google-research/bert/blob/master/create_pretraining_data.py)**
    2. Image: The image is equally splited into 8*8 image patches, and for each patch we extract 2048 features with pretrained ResNet50 model.
-(** Note 1: Leverage Tensorflow(tf-slim) to extract the image features. In detail, we extract AvgPool2D (2048) as the patch features。**[https://github.com/google-research/tf-slim](https://github.com/google-research/tf-slim))。
-** Note 2: For the masked image patches, the image featuers are set to zero**
+ ```bash
+ sh run_image_feature_extract.sh # refer this script
+ ```
+(** Note 1: Leverage Tensorflow(tf-slim) to extract the image features. In detail, we extract AvgPool2D (2048) as the patch features。**[https://github.com/google-research/tf-slim](https://github.com/google-research/tf-slim)。
+** Note 2: For the masked image patches, the image featuers are set to zero**)
 
 5. The text token features and image patch features are composed the input of FashionBERT.
 
