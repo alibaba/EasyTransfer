@@ -128,6 +128,7 @@ To learn more about the usage of AppZoo, please refer to our [documentation](htt
 - [Text Classification including BERT, TextCNN](https://www.yuque.com/easytransfer/itfpm9/rypc5x)
 - [Machine Reading Comprehesion including BERT, BERT-HAE](https://www.yuque.com/easytransfer/itfpm9/qrvqco)
 - [Sequence Labeling including BERT](https://www.yuque.com/easytransfer/itfpm9/we0go2)
+- [Meta Fine-tuning for Cross-domain Text Classification](https://www.yuque.com/easytransfer/cn/mgy5gb)
 
 
 
