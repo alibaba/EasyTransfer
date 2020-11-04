@@ -204,7 +204,8 @@ class BertTextMatchTwoTower(BaseTextMatch):
         """
         default_param_dict = {
             "pretrain_model_name_or_path": "pai-bert-base-zh",
-            "num_labels": 2
+            "num_labels": 2,
+            "projection_dim": -1
         }
         return default_param_dict
 
@@ -228,8 +229,21 @@ class BertTextMatchTwoTower(BaseTextMatch):
 
         with tf.variable_scope('text_match_bert_two_tower', reuse=tf.AUTO_REUSE):
             bert_backbone = model_zoo.get_pretrained_model(self.config.pretrain_model_name_or_path)
-            _, pool_output_a = bert_backbone([input_ids_a, input_mask_a, segment_ids_a], mode=mode)
-            _, pool_output_b = bert_backbone([input_ids_b, input_mask_b, segment_ids_b], mode=mode)
+            if self.config.projection_dim == -1:
+                _, pool_output_a = bert_backbone([input_ids_a, input_mask_a, segment_ids_a], mode=mode)
+                _, pool_output_b = bert_backbone([input_ids_b, input_mask_b, segment_ids_b], mode=mode)
+            else:
+                all_hidden_outputs_a, pool_output_a = bert_backbone([input_ids_a, input_mask_a, segment_ids_a],
+                                                                    mode=mode)
+                all_hidden_outputs_b, pool_output_b = bert_backbone([input_ids_b, input_mask_b, segment_ids_b],
+                                                                    mode=mode)
+                first_token_output_a = all_hidden_outputs_a[:, 0, :]
+                first_token_output_b = all_hidden_outputs_b[:, 0, :]
+
+                pool_output_a = tf.layers.dense(inputs=first_token_output_a, units=self.config.projection_dim,
+                                                     activation=None, name='output_dense_layer')
+                pool_output_b = tf.layers.dense(inputs=first_token_output_b, units=self.config.projection_dim,
+                                                         activation=None, name='output_dense_layer')
 
         logits = self._cosine(pool_output_a, pool_output_b)
 

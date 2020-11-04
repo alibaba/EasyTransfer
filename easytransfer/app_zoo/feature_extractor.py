@@ -42,11 +42,17 @@ class BertFeatureExtractor(ApplicationModel):
 
         input_ids, input_mask, segment_ids = bert_preprocessor(features)[:3]
 
+
         if self.finetune_model_name == "text_match_bert_two_tower":
             with tf.variable_scope('text_match_bert_two_tower', reuse=tf.AUTO_REUSE):
                 bert_backbone = model_zoo.get_pretrained_model(self.config.pretrain_model_name_or_path)
                 sequence_output, pooled_output = bert_backbone(
                     [input_ids, input_mask, segment_ids], output_features=True, mode=mode)
+                if hasattr(self.config, "projection_dim") and self.config.projection_dim != 1:
+                    first_token_output_a = sequence_output[:, 0, :]
+
+                    pooled_output = tf.layers.dense(inputs=first_token_output_a, units=self.config.projection_dim,
+                                                    activation=None, name='output_dense_layer')
         else:
             bert_backbone = model_zoo.get_pretrained_model(self.config.pretrain_model_name_or_path)
             sequence_output, pooled_output = bert_backbone(

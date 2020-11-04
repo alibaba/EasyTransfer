@@ -237,6 +237,100 @@ class TestEzTextMatch(unittest.TestCase):
         shutil.rmtree('ez_text_match_two_tower_models', ignore_errors=True)
         os.remove('ez_text_match.pred.csv')
 
+        argvs = ['easy_transfer_app',
+                 '--mode', 'train',
+                 '--inputTable', '../ut_data/ez_text_match/train.csv,../ut_data/ez_text_match/dev.csv',
+                 '--inputSchema',
+                 "example_id:int:1,query1:str:1,query2:str:1,is_same_question:str:1,category:str:1,score:float:1",
+                 '--firstSequence', 'query1',
+                 '--secondSequence', 'query2',
+                 '--labelName', 'is_same_question',
+                 '--labelEnumerateValues', '0,1',
+                 '--checkpointDir', 'ez_text_match_two_tower_models',
+                 '--numEpochs', '1',
+                 '--batchSize', '5',
+                 '--saveCheckpointSteps', '10000',
+                 '--optimizerType', 'adam',
+                 '--learningRate', '2e-5',
+                 '--modelName', 'text_match_bert_two_tower',
+                 '--distributionStrategy', 'MirroredStrategy',
+                 '--workerCount', '1',
+                 '--workerGPU', '1',
+                 '--workerCPU', '1',
+                 '--advancedParameters', """'
+                                    pretrain_model_name_or_path=google-bert-base-zh # For BERT
+                                    projection_dim=128
+                                    '
+                            """
+                 ]
+        print(' '.join(argvs))
+        try:
+            res = subprocess.check_output(' '.join(argvs), stderr=subprocess.STDOUT, shell=True)
+            print(res)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            raise RuntimeError
+
+        argvs = ['easy_transfer_app',
+                 '--mode', 'predict',
+                 '--inputTable', '../ut_data/ez_text_match/test.csv',
+                 '--outputTable', 'ez_text_match.pred.csv',
+                 '--inputSchema', 'example_id:int:1,query1:str:1,query2:str:1,category:str:1,score:float:1',
+                 '--firstSequence', 'query1',
+                 '--secondSequence', 'query2',
+                 '--appendCols', 'example_id,category,score,query1',
+                 '--outputSchema', 'predictions,probabilities,logits',
+                 '--checkpointPath', 'ez_text_match_two_tower_models/model.ckpt-0',
+                 '--batchSize', '100',
+                 '--workerCount', '1',
+                 '--workerGPU', '1',
+                 '--workerCPU', '1',
+                 ]
+        print(' '.join(argvs))
+        try:
+            res = subprocess.check_output(' '.join(argvs), stderr=subprocess.STDOUT, shell=True)
+            print(res)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            raise RuntimeError
+        self.assertTrue(os.path.exists('ez_text_match.pred.csv'))
+        os.remove('ez_text_match.pred.csv')
+
+        argvs = ['easy_transfer_app',
+                 '--mode', 'export',
+                 '--checkpointPath', 'ez_text_match_two_tower_models/model.ckpt-0',
+                 '--exportType', 'ez_bert_feat',
+                 '--exportDirBase', 'ez_text_match_two_tower_models/saved_model',
+                 ]
+        print(' '.join(argvs))
+        try:
+            res = subprocess.check_output(' '.join(argvs), stderr=subprocess.STDOUT, shell=True)
+            print(res)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            raise RuntimeError
+
+        argvs = ['ez_bert_feat',
+                 '--inputTable', '../ut_data/ez_bert_feat/one.seq.txt',
+                 '--outputTable', 'ez_text_match.feats.txt',
+                 '--inputSchema', 'example_id:int:1,query1:str:1,label:str:1,category:str:1,score:float:1',
+                 '--firstSequence', 'query1',
+                 '--appendCols', 'example_id,label,category,score,xxx',
+                 '--outputSchema', 'pool_output,first_token_output,all_hidden_outputs',
+                 '--modelName', 'ez_text_match_two_tower_models/saved_model',
+                 '--sequenceLength', '50',
+                 '--batchSize', '1']
+        print(' '.join(argvs))
+        try:
+            res = subprocess.check_output(' '.join(argvs), stderr=subprocess.STDOUT, shell=True)
+            print(res)
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            raise RuntimeError
+        self.assertTrue(os.path.exists('ez_text_match.feats.txt'))
+        os.remove('ez_text_match.feats.txt')
+        shutil.rmtree('ez_text_match_two_tower_models', ignore_errors=True)
+
     def test_7_train_dam(self):
         argvs = ['easy_transfer_app',
                  '--mode', 'train',

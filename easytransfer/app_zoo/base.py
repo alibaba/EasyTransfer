@@ -146,7 +146,9 @@ class ApplicationModel(base_model):
                                              input_schema=self.config.input_schema)
 
             predict_writer = get_writer_fn()(output_glob=self.config.predict_output_fp,
-                                             output_schema=self.config.output_schema)
+                                             output_schema=self.config.output_schema,
+                                             slice_id=0,
+                                             input_queue=None)
 
             self.run_predict(predict_reader,
                             predict_writer,

@@ -81,8 +81,13 @@ class BertFeatConfig(Config):
                 finetune_model_name = train_config_json["model_name"]
             else:
                 finetune_model_name = None
+            if "_config_json" in train_config_json:
+                train_model_config = train_config_json["_config_json"]["model_config"]
+            else:
+                train_model_config = None
         else:
             finetune_model_name = None
+            train_model_config = None
 
         if FLAGS.usePAI:
             all_input_col_names = get_all_columns_name(input_table)
@@ -131,6 +136,11 @@ class BertFeatConfig(Config):
                 'predict_output_fp': output_table
             }
         }
+        if train_model_config:
+            for key, val in train_model_config.items():
+                if key not in config_json["model_config"]:
+                    config_json["model_config"][str(key)] = val
+
         config_json["worker_hosts"] = FLAGS.worker_hosts
         config_json["task_index"] = FLAGS.task_index
         config_json["job_name"] = FLAGS.job_name

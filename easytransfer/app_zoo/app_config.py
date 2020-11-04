@@ -347,9 +347,14 @@ class AppConfig(Config):
                 else:
                     finetune_model_name = None
                 pretrain_model_name_or_path = train_config_json["pretrain_model_name_or_path"]
+                if "_config_json" in train_config_json:
+                    train_model_config = train_config_json["_config_json"]["model_config"]
+                else:
+                    train_model_config = None
             else:
                 pretrain_model_name_or_path = checkpoint_path
                 finetune_model_name = None
+                train_model_config = None
 
             config_json = {
                 "model_config": {
@@ -364,6 +369,10 @@ class AppConfig(Config):
                     "export_dir_base": export_dir_base
                 }
             }
+            if train_model_config:
+                for key, val in train_model_config.items():
+                    if str(key) not in config_json["model_config"]:
+                        config_json["model_config"][str(key)] = val
         elif export_type.startswith("convert"):
             config_json = {
                 "model_config": {
