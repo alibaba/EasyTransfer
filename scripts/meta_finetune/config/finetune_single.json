@@ -1,0 +1,40 @@
+{
+  "preprocess_config": {
+    "input_schema": "text:str:1,domain:str:1,label:str:1",
+    "sequence_length": 128,
+    "first_sequence": "text",
+    "second_sequence": "",
+    "label_name": "label",
+    "label_enumerate_values": "POS,NEG"
+  },
+  "model_config": {
+      "pretrain_model_name_or_path": "oss://pai-wcy/easytransfer/meta_ft/amazon_meta_ft/model.ckpt-438",
+      "num_labels": 2
+  },
+  "train_config": {
+      "keep_checkpoint_max": 10,
+      "train_batch_size": 32,
+      "save_steps": null,
+      "train_input_fp": "amazon_train_books.tsv",
+      "model_dir": "oss://pai-wcy/easytransfer/meta_ft/amazon_books_ft",
+      "learning_rate": 1e-5,
+      "throttle_secs": 100,
+      "num_epochs": 6,
+      "optimizer_config": {
+          "optimizer": "adam",
+          "learning_rate": 1e-5,
+          "lr_decay": "polynomial",
+          "warmup_ratio": 0.1,
+          "weight_decay_ratio": 0.01,
+          "gradient_clip": "true"
+      },
+      "distribution_config": {
+        "distribution_strategy": "MirroredStrategy"
+      }
+  },
+  "evaluate_config": {
+      "eval_input_fp": "amazon_dev_books.tsv",
+      "eval_batch_size": 32,
+      "num_eval_steps": null
+  }
+}

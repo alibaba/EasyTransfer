@@ -17,9 +17,7 @@
 
 The literature has witnessed the success of applying deep Transfer Learning (TL) for many real-world NLP applications, yet it is not easy to build an easy-to-use TL toolkit to achieve such a goal. To bridge this gap, EasyTransfer is designed to facilitate users leveraging deep TL for NLP applications at ease. It was developed in Alibaba in early 2017, and has been used in the major BUs in Alibaba group and achieved very good results in 20+ business scenarios. It supports the mainstream pre-trained ModelZoo, including pre-trained language models (PLMs) and multi-modal models on the PAI platform, integrates the SOTA models for the mainstream NLP applications in AppZoo, and supports knowledge distillation for PLMs. EasyTransfer is very convenient for users to quickly start model training, evaluation, offline prediction, and online deployment. It also provides rich APIs to make the development of NLP and transfer learning easier.
 
-# CLUE start
--[CLUE项目](https://github.com/CLUEbenchmark/CLUE)  
--[快速开始](https://github.com/CLUEbenchmark/EasyTransfer/blob/add_clue_quick_start/clue_quick_start.ipynb)
+
 # Main Features
 
 - **Language model pre-training tool:** it supports a comprehensive pre-training tool for users to pre-train language models such as T5 and BERT. Based on the tool, the user can easily train a model to achieve great results in the benchmark leaderboards such as CLUE, GLUE, and SuperGLUE;
@@ -85,7 +83,6 @@ app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
 ```
 You can find more details or play with the code in our Jupyter/Notebook [PAI-DSW](https://dsw-dev.data.aliyun.com/#/?fileUrl=https://raw.githubusercontent.com/alibaba/EasyTransfer/master/examples/easytransfer-quick_start.ipynb&fileName=easytransfer-quick_start.ipynb). 
 
-
 You can also use AppZoo Command Line Tools to quickly train an App model. Take text classification on SST-2 dataset as an example. First you can download the [train.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/train.tsv), [dev.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/dev.tsv) and [test.tsv](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/glue/SST-2/test.tsv), then start training: 
 
 ```bash
@@ -120,6 +117,7 @@ $ easy_transfer_app --mode predict \
 To learn more about the usage of AppZoo, please refer to our [documentation](https://www.yuque.com/easytransfer/itfpm9/ky6hky).
 
 
+
 # Tutorials
 
 - [PAI-ModelZoo (20+ pretrained models)](https://www.yuque.com/easytransfer/itfpm9/geiy58)
@@ -130,10 +128,11 @@ To learn more about the usage of AppZoo, please refer to our [documentation](htt
 - [Text Classification including BERT, TextCNN](https://www.yuque.com/easytransfer/itfpm9/rypc5x)
 - [Machine Reading Comprehesion including BERT, BERT-HAE](https://www.yuque.com/easytransfer/itfpm9/qrvqco)
 - [Sequence Labeling including BERT](https://www.yuque.com/easytransfer/itfpm9/we0go2)
+- [Meta Fine-tuning for Cross-domain Text Classification](https://www.yuque.com/easytransfer/cn/mgy5gb)
 
 
 
-# CLUE Benchmark
+# [CLUE Benchmark](https://www.cluebenchmarks.com/)
 
 
 
@@ -149,6 +148,8 @@ To learn more about the usage of AppZoo, please refer to our [documentation](htt
 
 
 You can find more benchmarks in [https://www.yuque.com/easytransfer/cn/rkm4p7](https://www.yuque.com/easytransfer/itfpm9/rkm4p7)
+
+Here is the CLUE quick start [notebook](https://github.com/CLUEbenchmark/EasyTransfer/blob/add_clue_quick_start/clue_quick_start.ipynb)
 
 
 # Links
@@ -169,5 +170,5 @@ Scan the following QR codes to join Dingtalk discussion group. The group discuss
 
 Also we can scan the following QR code to join wechat discussion group.
 
-<img src="https://cdn.nlark.com/yuque/0/2020/jpeg/2556223/1600700454586-a48630a0-b3dd-448b-ad3c-16dace1d93b9.jpeg#align=left&display=inline&height=352&margin=%5Bobject%20Object%5D&name=IMG_2106.JPG&originHeight=1178&originWidth=1016&size=312154&status=done&style=none&width=304" width="300"/>
+<img src="https://intranetproxy.alipay.com/skylark/lark/0/2020/jpeg/226643/1603306190699-56be6895-1287-42e3-b8a7-f957b1a4d7b7.jpeg#align=left&display=inline&height=352&margin=%5Bobject%20Object%5D&name=IMG_2129.JPG&originHeight=1178&originWidth=1016&size=312154&status=done&style=none&width=304" width="300"/>
 
