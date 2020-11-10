@@ -17,6 +17,7 @@
 
 
 import tensorflow as tf
+from tensorflow.python.framework import ops
 from .adam_weight_decay_optimizer import AdamWeightDecayOptimizer
 from .lamb_weight_decay_optimizer import LambWeightDecayOptimizer
 import numpy as np
@@ -24,6 +25,7 @@ import numpy as np
 def get_train_op(learning_rate,
                  weight_decay_ratio,
                  loss,
+                 num_towers=1,
                  warmup_ratio=0.1,
                  lr_decay="polynomial",
                  optimizer_name=None,
@@ -96,6 +98,7 @@ def get_train_op(learning_rate,
         tvars = tf.trainable_variables()
 
     grads = tf.gradients(loss, tvars)
+
     tf.logging.info("*******Num of trainable variables {}************".format(
         np.sum([np.prod(v.get_shape().as_list()) for v in tvars])))
 
@@ -105,6 +108,13 @@ def get_train_op(learning_rate,
         (grads, _) = tf.clip_by_global_norm(grads, clip_norm=clip_norm_value)
     else:
         tf.logging.info("*******Don't Clip Gradients************")
+
+    tf.logging.info("*********Num towers is {} *********".format(num_towers))
+    for i in range(len(grads)):
+        if grads[i] is not None:
+            if isinstance(grads[i], ops.IndexedSlices):
+                grads[i] = ops.convert_to_tensor(grads[i])
+            grads[i] *= (1. / num_towers)
 
     if num_freezed_layers > 0:
         tf.logging.info("*******Num Freezed Layers is {} ************".format(num_freezed_layers))
