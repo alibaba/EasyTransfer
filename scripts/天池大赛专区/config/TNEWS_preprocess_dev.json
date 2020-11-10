@@ -1,0 +1,15 @@
+{
+  "preprocess_config": {
+    "preprocess_input_fp": "tianchi_datasets/TNEWS/dev.csv",
+    "preprocess_output_fp": "tianchi_datasets/TNEWS/dev.tfrecord",
+    "preprocess_batch_size": 16,
+    "input_schema": "idx:str:1,sentence1:str:1,label:str:1",
+    "tokenizer_name_or_path": "google-bert-base-zh",
+    "first_sequence": "sentence1",
+    "second_sequence": null,
+    "label_name":"label",
+    "label_enumerate_values": "115,114,108,109,116,110,113,112,102,103,100,101,106,107,104",
+    "sequence_length": 128,
+    "output_schema": "input_ids,input_mask,segment_ids,label_id"
+  }
+}
