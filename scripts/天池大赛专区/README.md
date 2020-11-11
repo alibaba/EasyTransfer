@@ -57,20 +57,8 @@
 ```
   
 ## 评测标准    
-参赛选手仅可使用单模型，先求出每个任务的macro f1，然后在四个任务上取平均值，具体计算公式如下：
-$$
-公式待定【喻聪】
-$$
-任务j：
-$$
-第i类：f1_i = 2*\frac{precision*recall}{precision+recall}
-$$
-$$
-\\ macro\_f1_j = \frac{\sum_i^{N_j}f1_i}{N_j}
-$$
-$$
-\\ source = \frac{\sum_j^3macro\_f1_j}{3}
-$$
+参赛选手仅可使用单模型，先求出每个任务的macro average f1，然后在四个任务上取平均值
+
  
 ## 提交说明
 测试数据提供txt文本，类训练数据，选手需要为每一个txt文本输出对应的ann文本。ann文件存放目录压缩成zip格式进行提交。
@@ -151,17 +139,9 @@ sh run_convert_csv_to_tfrecords.sh
 ## 模型训练与评估
 根据上面方法可以生成训练与验证数据，运行以下脚本，就可以实现基于bert-base模型的数据训练与评估，因为评估中是按照顺序判断任务类型的，所以每个任务的评估数量需要一致。    
 ```
-python multitask_finetune.py --workerGPU=1 \
-  --mode=train_and_evaluate  \
-  --predict_input_fp=dev.list_tfrecord  \
-  --train_input_fp=train.list_tfrecord  \
-  --pretrain_model_name_or_path=google-bert-base-zh  \
-  --train_batch_size=16  \
-  --num_epochs=10  \
-  --model_dir=multitask_model_dir  \
-  --learning_rate=3e-5  \
+sh run_multitask_finetune.sh
 ```
-也可以通过运行`sh run_multitask_finetune.sh`来实现，训练与评估的具体细节，则可以参考[【使用EasyTransfer快速搭建天池大赛Baseline】](https://github.com/alibaba/EasyTransfer/blob/master/scripts/%E5%A4%A9%E6%B1%A0%E5%A4%A7%E8%B5%9B%E4%B8%93%E5%8C%BA/tianchi-quick_start.ipynb)
+也可以通过jupyter ipython notebook来实现，训练与评估的具体细节，则可以参考[【使用EasyTransfer快速搭建天池大赛Baseline】](https://github.com/alibaba/EasyTransfer/blob/master/scripts/%E5%A4%A9%E6%B1%A0%E5%A4%A7%E8%B5%9B%E4%B8%93%E5%8C%BA/tianchi-quick_start.ipynb)
 
 
 ## 提交结果
