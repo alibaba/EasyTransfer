@@ -166,12 +166,13 @@ class Config(object):
             self.eval_input_fp = config_json['evaluate_config']['eval_input_fp']
 
         elif self.mode == 'predict' or self.mode == 'predict_on_the_fly':
-            self.predict_checkpoint_path = config_json['predict_config']['predict_checkpoint_path']
+            self.predict_checkpoint_path = config_json['predict_config'].get('predict_checkpoint_path', None)
             self.input_schema = config_json['preprocess_config']['input_schema']
             self.label_name = config_json['preprocess_config'].get('label_name', None)
             self.label_enumerate_values = config_json['preprocess_config'].get('label_enumerate_values', None)
             self.append_feature_columns = config_json['preprocess_config'].get('append_feature_columns', None)
             self.model_dir = config_json.get('train_config', {}).get('model_dir', None)
+            self.output_schema = config_json['preprocess_config'].get('output_schema', None)
 
             if self.mode == 'predict_on_the_fly':
                 self.first_sequence = config_json['preprocess_config']['first_sequence']
@@ -694,15 +695,16 @@ class base_model(EzTransEstimator):
                     raise RuntimeError
 
             if "predict" in FLAGS.mode:
-                model_ckpt = config_json['predict_config']['predict_checkpoint_path'].split("/")[-1]
-                config_fp = config_json['predict_config']['predict_checkpoint_path'].replace(model_ckpt,
-                                                                                             "train_config.json")
+                if config_json['predict_config'].get('predict_checkpoint_path', None) is not None:
+                    model_ckpt = config_json['predict_config']['predict_checkpoint_path'].split("/")[-1]
+                    config_fp = config_json['predict_config']['predict_checkpoint_path'].replace(model_ckpt,
+                                                                                                 "train_config.json")
+                    if tf.gfile.Exists(config_fp):
+                        with tf.gfile.Open(config_fp, "r") as f:
+                            saved_config = json.load(f)
+                            model_config = saved_config.get("model_config", None)
+                            config_json["model_config"] = model_config
 
-                if tf.gfile.Exists(config_fp):
-                    with tf.gfile.Open(config_fp, "r") as f:
-                        saved_config = json.load(f)
-                        model_config = saved_config.get("model_config", None)
-                        config_json["model_config"] = model_config
             self.config = Config(mode=FLAGS.mode, config_json=config_json)
 
             if "train" in FLAGS.mode:
