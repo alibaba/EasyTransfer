@@ -1,7 +1,6 @@
-import sys
 import os
 import tensorflow as tf
-from easytransfer import base_model, Config, FLAGS
+from easytransfer import base_model, FLAGS
 from easytransfer import layers
 from easytransfer import model_zoo
 from easytransfer import preprocessors
@@ -9,7 +8,6 @@ from easytransfer.datasets import TFRecordReader
 from easytransfer.losses import softmax_cross_entropy
 from sklearn.metrics import classification_report
 import numpy as np
-import pdb
 
 class MultiTaskTFRecordReader(TFRecordReader):
     def __init__(self, input_glob, batch_size, is_training=False,
@@ -39,12 +37,9 @@ class MultiTaskTFRecordReader(TFRecordReader):
 class Application(base_model):
     def __init__(self, **kwargs):
         super(Application, self).__init__(**kwargs)
-        self.user_defined_config = kwargs["user_defined_config"]
 
     def build_logits(self, features, mode=None):
-
-        preprocessor = preprocessors.get_preprocessor(self.pretrain_model_name_or_path,
-                                                      user_defined_config=self.user_defined_config)
+        preprocessor = preprocessors.get_preprocessor(self.pretrain_model_name_or_path)
 
         model = model_zoo.get_pretrained_model(self.pretrain_model_name_or_path)
 
@@ -54,13 +49,9 @@ class Application(base_model):
                      kernel_initializer=layers.get_initializer(0.02),
                      name='tnews_dense')
 
-        afqmc_dense = layers.Dense(2,
-                             kernel_initializer=layers.get_initializer(0.02),
-                             name='afqmc_dense')
-
         ocemotion_dense = layers.Dense(7,
                              kernel_initializer=layers.get_initializer(0.02),
-                             name='afqmc_dense')
+                             name='ocemotion_dense')
 
         ocnli_dense = layers.Dense(3,
                              kernel_initializer=layers.get_initializer(0.02),
@@ -74,16 +65,14 @@ class Application(base_model):
         if mode == tf.estimator.ModeKeys.TRAIN:
             pooled_output = tf.nn.dropout(pooled_output, keep_prob=0.9)
 
-        logits = tf.case([(tf.equal(tf.mod(global_step, 4), 0), lambda: tnews_dense(pooled_output)),
-                          (tf.equal(tf.mod(global_step, 4), 1), lambda: afqmc_dense(pooled_output)),
-                          (tf.equal(tf.mod(global_step, 4), 2), lambda: ocemotion_dense(pooled_output)),
-                          (tf.equal(tf.mod(global_step, 4), 3), lambda: ocnli_dense(pooled_output)),
+        logits = tf.case([(tf.equal(tf.mod(global_step, 3), 0), lambda: tnews_dense(pooled_output)),
+                          (tf.equal(tf.mod(global_step, 3), 1), lambda: ocemotion_dense(pooled_output)),
+                          (tf.equal(tf.mod(global_step, 3), 2), lambda: ocnli_dense(pooled_output)),
                           ], exclusive=True)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
             ret = {
                 "tnews_logits": tnews_dense(pooled_output),
-                "afqmc_logits": afqmc_dense(pooled_output),
                 "ocemotion_logits": ocemotion_dense(pooled_output),
                 "ocnli_logits": ocnli_dense(pooled_output),
                 "label_ids": label_ids
@@ -94,26 +83,22 @@ class Application(base_model):
 
     def build_loss(self, logits, labels):
         global_step = tf.train.get_or_create_global_step()
-        return tf.case([(tf.equal(tf.mod(global_step, 4), 0), lambda : softmax_cross_entropy(labels, 15, logits)),
-                      (tf.equal(tf.mod(global_step, 4), 1), lambda : softmax_cross_entropy(labels, 2, logits)),
-                      (tf.equal(tf.mod(global_step, 4), 2), lambda : softmax_cross_entropy(labels, 7, logits)),
-                      (tf.equal(tf.mod(global_step, 4), 3), lambda : softmax_cross_entropy(labels, 3, logits)),
+        return tf.case([(tf.equal(tf.mod(global_step, 3), 0), lambda : softmax_cross_entropy(labels, 15, logits)),
+                      (tf.equal(tf.mod(global_step, 3), 1), lambda : softmax_cross_entropy(labels, 7, logits)),
+                      (tf.equal(tf.mod(global_step, 3), 2), lambda : softmax_cross_entropy(labels, 3, logits)),
                       ], exclusive=True)
 
     def build_predictions(self, output):
         tnews_logits = output['tnews_logits']
-        afqmc_logits = output['afqmc_logits']
         ocemotion_logits = output['ocemotion_logits']
         ocnli_logits = output['ocnli_logits']
 
         tnews_predictions = tf.argmax(tnews_logits, axis=-1, output_type=tf.int32)
-        afqmc_predictions = tf.argmax(afqmc_logits, axis=-1, output_type=tf.int32)
         ocemotion_predictions = tf.argmax(ocemotion_logits, axis=-1, output_type=tf.int32)
         ocnli_predictions = tf.argmax(ocnli_logits, axis=-1, output_type=tf.int32)
 
         ret_dict = {
             "tnews_predictions": tnews_predictions,
-            "afqmc_predictions": afqmc_predictions,
             "ocemotion_predictions": ocemotion_predictions,
             "ocnli_predictions": ocnli_predictions,
             "label_ids": output['label_ids']
@@ -121,66 +106,16 @@ class Application(base_model):
         return ret_dict
 
 def main(_):
-    config_json = {
-        "worker_hosts": "localhost",
-        "task_index": 1,
-        "job_name": "chief",
-        "num_gpus": 1,
-        "num_workers": 1,
-        "preprocess_config": {
-            "input_schema": "input_ids:int:128,input_mask:int:128,segment_ids:int:128,label_id:int:1",
-            "sequence_length": 128,
-        },
-        "model_config": {
-        },
-        "train_config": {
-            "keep_checkpoint_max": 11,
-            "optimizer_config": {
-                "optimizer": "adam",
-                "weight_decay_ratio": 0.01,
-                "warmup_ratio": 0.1,
-            },
-            "distribution_config": {
-                "distribution_strategy": None,
-            },
-            "save_steps": 1000
-        },
-        "predict_config": {
-            "predict_checkpoint_path": None,
-            "predict_input_fp": None,
-            "predict_batch_size": 32,
-            "predict_output_fp": None
-        },
-    }
-
-    for arg in sys.argv[1:]:
-        key = arg.split("=")[0].replace("--", "")
-        val = arg.split("=")[1]
-        if key == 'train_input_fp' or key == "train_batch_size" \
-                or key == "model_dir" or key == 'num_epochs':
-            config_json['train_config'][key] = val
-        elif key == "predict_checkpoint_path" or key == "predict_input_fp":
-            config_json['predict_config'][key] = arg.split("=")[1]
-        elif key == "learning_rate" or key == 'warmup_ratio' or key == 'weight_decay_ratio':
-            config_json['train_config']['optimizer_config'][key] = val
-        elif key == 'pretrain_model_name_or_path':
-            config_json['model_config'][key] = val
-        elif key == 'num_gpus':
-            config_json[key] = int(val)
-
-    config = Config(mode=FLAGS.mode, config_json=config_json)
-    app = Application(user_defined_config=config)
-
+    FLAGS.mode = "train"
+    app = Application()
     train_reader = MultiTaskTFRecordReader(input_glob=app.train_input_fp,
                                            is_training=True,
                                            input_schema=app.input_schema,
                                            batch_size=app.train_batch_size)
 
     app.run_train(reader=train_reader)
-
-    config = Config(mode="predict", config_json=config_json)
-    app = Application(user_defined_config=config)
-
+    FLAGS.mode = "predict"
+    app = Application()
     predict_reader = MultiTaskTFRecordReader(input_glob=app.predict_input_fp,
                                            is_training=False,
                                            input_schema=app.input_schema,
@@ -200,39 +135,27 @@ def main(_):
         tf.logging.info("checkpoint_path is {}".format(checkpoint_path))
         all_tnews_preds = []
         all_tnews_gts = []
-        all_afqmc_preds = []
-        all_afqmc_gts = []
         all_ocemotion_preds = []
         all_ocemotion_gts = []
         all_ocnli_preds = []
         all_ocnli_gts = []
         for i, output in enumerate(app.run_predict(reader=predict_reader, checkpoint_path=checkpoint_path)):
             label_ids = np.squeeze(output['label_ids'])
-            if i%4 ==0:
+            if i%3 ==0:
                 tnews_predictions = output['tnews_predictions']
                 all_tnews_preds.extend(tnews_predictions.tolist())
                 all_tnews_gts.extend(label_ids.tolist())
-            elif i%4==1:
-                afqmc_predictions = output['afqmc_predictions']
-                all_afqmc_preds.extend(afqmc_predictions.tolist())
-                all_afqmc_gts.extend(label_ids.tolist())
-            elif i%4==2:
+            elif i%3==1:
                 ocemotion_predictions = output['ocemotion_predictions']
                 all_ocemotion_preds.extend(ocemotion_predictions.tolist())
                 all_ocemotion_gts.extend(label_ids.tolist())
-            elif i%4==3:
+            elif i%3==2:
                 ocnli_predictions = output['ocnli_predictions']
                 all_ocnli_preds.extend(ocnli_predictions.tolist())
                 all_ocnli_gts.extend(label_ids.tolist())
 
-            if i == 20:
-                break
-
         tnews_report = classification_report(all_tnews_gts, all_tnews_preds, digits=4)
         tnews_macro_avg_f1 = float(tnews_report.split()[-8])
-
-        afqmc_report = classification_report(all_afqmc_gts, all_afqmc_preds, digits=4)
-        afqmc_macro_avg_f1 = float(afqmc_report.split()[-8])
 
         ocemotion_report = classification_report(all_ocemotion_gts, all_ocemotion_preds, digits=4)
         ocemotion_macro_avg_f1 = float(ocemotion_report.split()[-8])
@@ -240,7 +163,7 @@ def main(_):
         ocnli_report = classification_report(all_ocnli_gts, all_ocnli_preds, digits=4)
         ocnli_macro_avg_f1 = float(ocnli_report.split()[-8])
 
-        macro_f1 = (tnews_macro_avg_f1 + afqmc_macro_avg_f1 + ocemotion_macro_avg_f1 + ocnli_macro_avg_f1)/4.0
+        macro_f1 = (tnews_macro_avg_f1 + ocemotion_macro_avg_f1 + ocnli_macro_avg_f1)/3.0
         if macro_f1 >= best_macro_f1:
             best_macro_f1 = macro_f1
             best_ckpt = ckpt

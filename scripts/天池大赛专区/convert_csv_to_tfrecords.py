@@ -3,7 +3,6 @@ from easytransfer import base_model
 from easytransfer.datasets import CSVReader, TFRecordWriter
 from easytransfer import preprocessors
 
-
 class FinetuneSerialization(base_model):
     def __init__(self, **kwargs):
         super(FinetuneSerialization, self).__init__(**kwargs)
@@ -36,7 +35,6 @@ def main(_):
                             output_schema=app.output_schema)
 
     app.run_preprocess(reader=reader, writer=writer)
-
 
 if __name__ == "__main__":
     tf.app.run()
