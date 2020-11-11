@@ -57,7 +57,9 @@
 ```
   
 ## 评测标准    
-参赛选手仅可使用单模型，先求出每个任务的macro average f1，然后在四个任务上取平均值
+依照参赛选手提交的模型，求出每个任务的macro f1，然后在四个任务上取平均值，macro f1具体计算公式请参考sklearn上的定义：
+https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score
+
 
  
 ## 提交说明
