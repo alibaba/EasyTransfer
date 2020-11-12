@@ -153,32 +153,42 @@ class PreprocessorConfig(object):
                     tf.gfile.Copy(os.path.join(dir_path, "vocab.txt"),
                                   os.path.join(model_dir, "vocab.txt"))
 
+        albert_language = "zh"
         if "/" not in pretrain_model_name_or_path:
             model_type = pretrain_model_name_or_path.split("-")[1]
             if model_type == "albert":
                 vocab_path = os.path.join(FLAGS.modelZooBasePath,
                                           sentencepiece_model_name_vocab_path_map[pretrain_model_name_or_path])
+                if "30k-clean.model" in vocab_path:
+                    albert_language = "en"
+                else:
+                    albert_language = "zh"
             else:
                 vocab_path = os.path.join(FLAGS.modelZooBasePath,
                                           wordpiece_model_name_vocab_path_map[pretrain_model_name_or_path])
 
         else:
-            vocab_path = os.path.join(os.path.dirname(pretrain_model_name_or_path), "vocab.txt")
             with tf.gfile.GFile(os.path.join(os.path.dirname(pretrain_model_name_or_path), "config.json")) as reader:
                 text = reader.read()
             json_config = json.loads(text)
             model_type = json_config["model_type"]
+            if model_type == "albert":
+                if tf.gfile.Exists(os.path.join(os.path.dirname(pretrain_model_name_or_path), "vocab.txt")):
+                    albert_language = "zh"
+                    vocab_path = os.path.join(os.path.dirname(pretrain_model_name_or_path), "vocab.txt")
+                elif tf.gfile.Exists(os.path.join(os.path.dirname(pretrain_model_name_or_path), "30k-clean.model")):
+                    albert_language = "en"
+                    vocab_path = os.path.join(os.path.dirname(pretrain_model_name_or_path), "30k-clean.model")
+            else:
+                vocab_path = os.path.join(os.path.dirname(pretrain_model_name_or_path), "vocab.txt")
 
         assert model_type is not None, "you must specify model_type in pretrain_model_name_or_path"
 
-        if model_type == "albert" and "/" not in pretrain_model_name_or_path:
-            full_spm_model_fp = vocab_path
-        elif model_type == "albert" and "/" in pretrain_model_name_or_path:
-            full_spm_model_fp = os.path.join(os.path.dirname(pretrain_model_name_or_path), "30k-clean.model")
-
-        if model_type == "albert" and tf.gfile.Exists(full_spm_model_fp):
-            tf.logging.info("*******Using albert spm model for tokenization********".format(full_spm_model_fp))
-            self.tokenizer = FullTokenizer(vocab_file=vocab_path, spm_model_file=full_spm_model_fp)
+        if model_type == "albert":
+            if albert_language == "en":
+                self.tokenizer = FullTokenizer(spm_model_file=vocab_path)
+            else:
+                self.tokenizer = FullTokenizer(vocab_file=vocab_path)
         else:
             self.tokenizer = FullTokenizer(vocab_file=vocab_path)
 
