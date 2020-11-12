@@ -73,8 +73,11 @@ wordpiece_model_name_vocab_path_map = {
     'brightmart-roberta-large-zh': "roberta/brightmart-roberta-large-zh/vocab.txt",
     'icbu-imagebert-small-en': "imagebert/icbu-imagebert-small-en/vocab.txt",
     'pai-transformer-base-zh': "transformer/pai-transformer-base-zh/vocab.txt",
-    'pai-factorizedbert-base-en': "bert/pai-factorizedbert-base-en/vocab.txt",
-    'pai-imagebert-base-en': "imagebert/pai-imagebert-base-en/vocab.txt"
+    'pai-linformer-base-en': "linformer/pai-linformer-base-en/vocab.txt",
+    'pai-xformer-base-en': "xformer/pai-xformer-base-en/vocab.txt",
+    'pai-imagebert-base-en': "imagebert/pai-imagebert-base-en/vocab.txt",
+    'pai-synthesizer-base-en': "synthesizer/pai-synthesizer-base-en/vocab.txt",
+    'pai-sentimentbert-base-zh': "sentimentbert/pai-sentimentbert-base-zh/vocab.txt"
 }
 
 def truncate_seq_pair(tokens_a, tokens_b, max_length):
@@ -168,8 +171,13 @@ class PreprocessorConfig(object):
 
         assert model_type is not None, "you must specify model_type in pretrain_model_name_or_path"
 
-        full_spm_model_fp = os.path.join(os.path.dirname(pretrain_model_name_or_path), "30k-clean.model")
+        if model_type == "albert" and "/" not in pretrain_model_name_or_path:
+            full_spm_model_fp = vocab_path
+        elif model_type == "albert" and "/" in pretrain_model_name_or_path:
+            full_spm_model_fp = os.path.join(os.path.dirname(pretrain_model_name_or_path), "30k-clean.model")
+
         if model_type == "albert" and tf.gfile.Exists(full_spm_model_fp):
+            tf.logging.info("*******Using albert spm model for tokenization********".format(full_spm_model_fp))
             self.tokenizer = FullTokenizer(vocab_file=vocab_path, spm_model_file=full_spm_model_fp)
         else:
             self.tokenizer = FullTokenizer(vocab_file=vocab_path)
