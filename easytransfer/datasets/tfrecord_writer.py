@@ -27,7 +27,7 @@ class TFRecordWriter(Process):
 
     """
 
-    def __init__(self, output_glob, output_schema, input_queue):
+    def __init__(self, output_glob, output_schema, input_queue=None):
 
         job_name = 'DistTFRecordWriter'
         super(TFRecordWriter, self).__init__(job_name, 1, input_queue)
