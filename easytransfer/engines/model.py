@@ -20,6 +20,7 @@ import numpy as np
 import os
 import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.INFO)
+tf.logging.info("*********** tf.__version__ is {} ******".format(tf.__version__))
 SEED = 123123
 os.environ['PYTHONHASHSEED'] = str(SEED)
 random.seed(SEED)
@@ -36,7 +37,6 @@ flags.DEFINE_string('worker_hosts', 'localhost:5001', 'worker_hosts')
 flags.DEFINE_string('job_name', 'worker', 'job_name')
 flags.DEFINE_string("mode", default=None, help="Which mode")
 flags.DEFINE_string("modelZooBasePath", default=os.path.join(os.getenv("HOME"), ".eztransfer_modelzoo"), help="eztransfer_modelzoo")
-flags.DEFINE_bool("usePAI", default=False, help="Whether to use pai")
 flags.DEFINE_integer("workerCount", default=1, help="num_workers")
 flags.DEFINE_integer("workerGPU", default=1, help="num_gpus")
 flags.DEFINE_integer("workerCPU", default=1, help="num_cpus")
@@ -57,7 +57,7 @@ class Config(object):
         self.job_name = str(config_json["job_name"])
         self.num_gpus = int(config_json["num_gpus"])
         self.num_workers = int(config_json["num_workers"])
-        if not FLAGS.usePAI:
+        if "PAI" not in tf.__version__:
             FLAGS.modelZooBasePath = config_json.get("modelZooBasePath", os.path.join(os.getenv("HOME"), ".eztransfer_modelzoo"))
         tf.logging.info("***************** modelZooBasePath {} ***************".format(FLAGS.modelZooBasePath))
         if self.mode == 'train' or self.mode == "train_and_evaluate" \
@@ -289,7 +289,7 @@ class EzTransEstimator(object):
                     (self.config.distribution_strategy == "ExascaleStrategy" or
                      self.config.distribution_strategy == "CollectiveAllReduceStrategy"):
 
-                if FLAGS.usePAI:
+                if "PAI" in tf.__version__:
                     import pai
                     worker_hosts = self.config.worker_hosts.split(',')
                     tf.logging.info("***********Job Name is {}***********".format(self.config.job_name))
@@ -302,7 +302,7 @@ class EzTransEstimator(object):
 
                 if self.config.distribution_strategy == "ExascaleStrategy":
                     tf.logging.info("*****************Using ExascaleStrategy*********************")
-                    if FLAGS.usePAI:
+                    if "PAI" in tf.__version__:
                         tf.logging.info("***********ESS_COMMUNICATION_NUM_COMMUNICATORS {}***********".format(
                             self.config.num_communicators))
                         tf.logging.info(
@@ -313,11 +313,11 @@ class EzTransEstimator(object):
                                                                         num_communicators=self.config.num_communicators,
                                                                         max_splits=self.config.num_splits)
                     else:
-                        raise ValueError("Please set usePAI is True")
+                        raise ValueError("Please run ExascaleStrategy in DLC")
 
                 elif self.config.distribution_strategy == "CollectiveAllReduceStrategy":
                     tf.logging.info("*****************Using CollectiveAllReduceStrategy*********************")
-                    if FLAGS.usePAI:
+                    if "PAI" in tf.__version__:
                         cross_tower_ops_type = "horovod"
                         tf.logging.info("*****************cross_tower_ops_type is {}*********************".format(
                             cross_tower_ops_type))
@@ -341,7 +341,7 @@ class EzTransEstimator(object):
             elif self.config.num_gpus > 1 and self.config.num_workers == 1 and \
                     self.config.distribution_strategy == "MirroredStrategy":
                 tf.logging.info("*****************Using MirroredStrategy*********************")
-                if FLAGS.usePAI:
+                if "PAI" in tf.__version__:
                     tf.logging.info("*****************Using PAI MirroredStrategy*********************")
                     if 'TF_CONFIG' in os.environ:
                         del os.environ['TF_CONFIG']
@@ -360,7 +360,7 @@ class EzTransEstimator(object):
             elif self.config.num_gpus >= 1 and self.config.num_workers >= 1 and \
                     self.config.distribution_strategy == "WhaleStrategy":
 
-                if FLAGS.usePAI:
+                if "PAI" in tf.__version__:
                     tf.logging.info("***********Job Name is {}***********".format(self.config.job_name))
                     tf.logging.info("***********Task Index is {}***********".format(self.config.task_index))
                     tf.logging.info("***********Worker Hosts is {}***********".format(self.config.worker_hosts))

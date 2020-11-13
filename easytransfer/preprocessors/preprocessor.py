@@ -108,7 +108,7 @@ class PreprocessorConfig(object):
         # configurate tokenizer
         pretrain_model_name_or_path = kwargs['pretrain_model_name_or_path']
 
-        if FLAGS.usePAI is False and "/" not in pretrain_model_name_or_path:
+        if "PAI" not in tf.__version__ and "/" not in pretrain_model_name_or_path:
             model_type = pretrain_model_name_or_path.split("-")[1]
             if six.PY2:
                 import errno
@@ -152,6 +152,9 @@ class PreprocessorConfig(object):
                 if tf.gfile.Exists(os.path.join(dir_path, "vocab.txt")):
                     tf.gfile.Copy(os.path.join(dir_path, "vocab.txt"),
                                   os.path.join(model_dir, "vocab.txt"))
+                if tf.gfile.Exists(os.path.join(dir_path, "30k-clean.model")):
+                    tf.gfile.Copy(os.path.join(dir_path, "30k-clean.model"),
+                                  os.path.join(model_dir, "30k-clean.model"))
 
         albert_language = "zh"
         if "/" not in pretrain_model_name_or_path:
