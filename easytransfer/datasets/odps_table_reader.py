@@ -64,7 +64,8 @@ class OdpsTableReader(Reader):
 
         if is_training:
             self.num_train_examples = self.table_reader.get_row_count()
-            tf.logging.info("{}, total number of training examples {}".format(input_glob, self.num_train_examples))
+            tf.logging.info("{}, total number of training examples {} in slice id {} of slice count {}"
+                            .format(input_glob, self.num_train_examples, slice_id, slice_count))
         else:
             self.num_eval_examples = self.table_reader.get_row_count()
             tf.logging.info(
@@ -72,8 +73,8 @@ class OdpsTableReader(Reader):
 
         self.record_defaults = []
         self.feature_types = []
-        self.slice_id = 0
-        self.slice_count = 1
+        self.slice_id = slice_id
+        self.slice_count = slice_count
         self.shapes = []
 
         for name, tensor in self.input_tensors.items():

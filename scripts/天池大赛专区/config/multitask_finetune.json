@@ -1,0 +1,22 @@
+{
+  "preprocess_config": {
+    "input_schema": "input_ids:int:128,input_mask:int:128,segment_ids:int:128,label_id:int:1",
+    "sequence_length": 128
+  },
+  "model_config": {
+    "pretrain_model_name_or_path": "pai-bert-tiny-zh"
+  },
+  "train_config": {
+    "train_input_fp": "train.list_tfrecord",
+    "train_batch_size": 2,
+    "num_epochs": 0.01,
+    "model_dir": "model_dir",
+    "optimizer_config": {
+      "learning_rate": 1e-5
+    }
+  },
+  "predict_config": {
+    "predict_input_fp": "dev.list_tfrecord",
+    "predict_batch_size": 4
+  }
+}

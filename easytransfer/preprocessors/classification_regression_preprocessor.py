@@ -25,6 +25,7 @@ class ClassificationRegressionPreprocessorConfig(PreprocessorConfig):
         super(ClassificationRegressionPreprocessorConfig, self).__init__(**kwargs)
 
         self.input_schema = kwargs.get("input_schema")
+        self.output_schema = kwargs.get("output_schema", None)
         self.sequence_length = kwargs.get("sequence_length")
         self.first_sequence = kwargs.get("first_sequence")
         self.second_sequence = kwargs.get("second_sequence")
@@ -162,7 +163,10 @@ class PairedClassificationRegressionPreprocessor(ClassificationRegressionPreproc
     def set_feature_schema(self):
         if self.mode.startswith("predict") or self.mode == "preprocess":
             self.output_schema = self.config.output_schema
-        self.output_tensor_names = ["input_ids", "input_mask", "segment_ids", "label_id"]
+        #self.output_tensor_names = ["input_ids", "input_mask", "segment_ids", "label_id"]
+        self.output_tensor_names = ["input_ids_a", "input_mask_a", "segment_ids_a",
+                                    "input_ids_b", "input_mask_b", "segment_ids_b",
+                                    "label_id"]
         self.seq_lens = [self.config.sequence_length] * 6 + [1]
         if len(self.label_idx_map) >= 2:
             self.feature_value_types = [tf.int64] * 6 + [tf.int64]
@@ -170,6 +174,8 @@ class PairedClassificationRegressionPreprocessor(ClassificationRegressionPreproc
             self.feature_value_types = [tf.int64] * 6 + [tf.float32]
 
     def convert_example_to_features(self, items):
+        import pdb
+        pdb.set_trace()
         """ Convert single example to classifcation/regression features
 
         Args:

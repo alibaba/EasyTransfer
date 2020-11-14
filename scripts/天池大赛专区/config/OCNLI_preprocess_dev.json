@@ -1,0 +1,15 @@
+{
+  "preprocess_config": {
+    "preprocess_input_fp": "tianchi_datasets/OCNLI/dev.csv",
+    "preprocess_output_fp": "tianchi_datasets/OCNLI/dev.tfrecord",
+    "preprocess_batch_size": 16,
+    "input_schema": "idx:str:1,sentence1:str:1,sentence2:str:1,label:str:1",
+    "tokenizer_name_or_path": "google-bert-base-zh",
+    "first_sequence": "sentence1",
+    "second_sequence": "sentence2",
+    "label_name":"label",
+    "label_enumerate_values": "0,1,2",
+    "sequence_length": 128,
+    "output_schema": "input_ids,input_mask,segment_ids,label_id"
+  }
+}

@@ -20,12 +20,13 @@ import numpy as np
 import os
 import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.INFO)
+tf.logging.info("*********** tf.__version__ is {} ******".format(tf.__version__))
 SEED = 123123
 os.environ['PYTHONHASHSEED'] = str(SEED)
 random.seed(SEED)
 np.random.seed(SEED)
-tf.set_random_seed(SEED)
 tf.reset_default_graph()
+tf.set_random_seed(SEED)
 
 flags = tf.app.flags
 flags.DEFINE_string("config", default=None, help='')
@@ -36,7 +37,6 @@ flags.DEFINE_string('worker_hosts', 'localhost:5001', 'worker_hosts')
 flags.DEFINE_string('job_name', 'worker', 'job_name')
 flags.DEFINE_string("mode", default=None, help="Which mode")
 flags.DEFINE_string("modelZooBasePath", default=os.path.join(os.getenv("HOME"), ".eztransfer_modelzoo"), help="eztransfer_modelzoo")
-flags.DEFINE_bool("usePAI", default=False, help="Whether to use pai")
 flags.DEFINE_integer("workerCount", default=1, help="num_workers")
 flags.DEFINE_integer("workerGPU", default=1, help="num_gpus")
 flags.DEFINE_integer("workerCPU", default=1, help="num_cpus")
@@ -57,7 +57,7 @@ class Config(object):
         self.job_name = str(config_json["job_name"])
         self.num_gpus = int(config_json["num_gpus"])
         self.num_workers = int(config_json["num_workers"])
-        if not FLAGS.usePAI:
+        if "PAI" not in tf.__version__:
             FLAGS.modelZooBasePath = config_json.get("modelZooBasePath", os.path.join(os.getenv("HOME"), ".eztransfer_modelzoo"))
         tf.logging.info("***************** modelZooBasePath {} ***************".format(FLAGS.modelZooBasePath))
         if self.mode == 'train' or self.mode == "train_and_evaluate" \
@@ -65,9 +65,6 @@ class Config(object):
 
             self.enable_xla = bool(config_json["train_config"].get('distribution_config', {}).get(
                 'enable_xla', False))
-
-            self.enable_auto_mixed_precision = bool(config_json["train_config"].get('distribution_config', {}).get(
-                'enable_auto_mixed_precision', False))
 
             self.distribution_strategy = str(
                 config_json["train_config"].get('distribution_config', {}).get("distribution_strategy", None))
@@ -79,6 +76,12 @@ class Config(object):
 
             self.num_model_replica = int(config_json["train_config"].get('distribution_config', {}).get(
                 'num_model_replica', 1))
+
+            self.num_communicators = int(config_json["train_config"].get('distribution_config', {}).get(
+                'num_communicators', 1))
+
+            self.num_splits = int(config_json["train_config"].get('distribution_config', {}).get(
+                'num_splits', 1))
 
             # optimizer
             self.optimizer = str(config_json["train_config"]['optimizer_config'].get('optimizer', "adam"))
@@ -155,16 +158,21 @@ class Config(object):
             for key, val in config_json['model_config'].items():
                 setattr(self, key, val)
 
+            self.model_dir = str(config_json['train_config'].get('model_dir', None))
+            self.distribution_strategy = str(
+                config_json["train_config"].get('distribution_config', {}).get("distribution_strategy", None))
             self.eval_batch_size = config_json['evaluate_config']['eval_batch_size']
             self.num_eval_steps = config_json['evaluate_config'].get('num_eval_steps', None)
             self.eval_input_fp = config_json['evaluate_config']['eval_input_fp']
 
         elif self.mode == 'predict' or self.mode == 'predict_on_the_fly':
-            self.predict_checkpoint_path = config_json['predict_config']['predict_checkpoint_path']
+            self.predict_checkpoint_path = config_json['predict_config'].get('predict_checkpoint_path', None)
             self.input_schema = config_json['preprocess_config']['input_schema']
             self.label_name = config_json['preprocess_config'].get('label_name', None)
             self.label_enumerate_values = config_json['preprocess_config'].get('label_enumerate_values', None)
             self.append_feature_columns = config_json['preprocess_config'].get('append_feature_columns', None)
+            self.model_dir = config_json.get('train_config', {}).get('model_dir', None)
+            self.output_schema = config_json['preprocess_config'].get('output_schema', None)
 
             if self.mode == 'predict_on_the_fly':
                 self.first_sequence = config_json['preprocess_config']['first_sequence']
@@ -247,32 +255,41 @@ class EzTransEstimator(object):
             else:
                 tf.logging.info("***********Disable Tao***********")
 
-            if self.config.enable_auto_mixed_precision is True:
-                tf.logging.info("***********Enable AUTO_MIXED_PRECISION***********")
-                os.environ['TF_AUTO_MIXED_PRECISION'] = 'True'
-                os.environ['lossScaling'] = 'auto'
-            else:
-                tf.logging.info("***********Disable AUTO_MIXED_PRECISION***********")
+            NCCL_MAX_NRINGS = "4"
+            NCCL_MIN_NRINGS = "2"
+            NCCL_IB_DISABLE = "0"
+            NCCL_P2P_DISABLE = "0"
+            NCCL_SHM_DISABLE = "0"
+            NCCL_LAUNCH_MODE = "PARALLEL"
 
-            NCCL_MAX_NRINGS = "1"
-            NCCL_MIN_NRINGS = "1"
             TF_JIT_PROFILING = 'False'
             PAI_ENABLE_HLO_DUMPER = 'False'
+
             os.environ['PAI_ENABLE_HLO_DUMPER'] = PAI_ENABLE_HLO_DUMPER
             os.environ['TF_JIT_PROFILING'] = TF_JIT_PROFILING
+
             os.environ["NCCL_MAX_NRINGS"] = NCCL_MAX_NRINGS
             os.environ["NCCL_MIN_NRINGS"] = NCCL_MIN_NRINGS
-            os.environ["NCCL_LAUNCH_MODE"] = "PARALLEL"
+            os.environ["NCCL_IB_DISABLE"] = NCCL_IB_DISABLE
+            os.environ["NCCL_P2P_DISABLE"] = NCCL_P2P_DISABLE
+            os.environ["NCCL_SHM_DISABLE"] = NCCL_SHM_DISABLE
+            os.environ["NCCL_LAUNCH_MODE"] = NCCL_LAUNCH_MODE
+
+            tf.logging.info("***********NCCL_IB_DISABLE {}***********".format(NCCL_IB_DISABLE))
+            tf.logging.info("***********NCCL_P2P_DISABLE {}***********".format(NCCL_P2P_DISABLE))
+            tf.logging.info("***********NCCL_SHM_DISABLE {}***********".format(NCCL_SHM_DISABLE))
             tf.logging.info("***********NCCL_MAX_NRINGS {}***********".format(NCCL_MAX_NRINGS))
             tf.logging.info("***********NCCL_MIN_NRINGS {}***********".format(NCCL_MIN_NRINGS))
+            tf.logging.info("***********NCCL_LAUNCH_MODE {}***********".format(NCCL_LAUNCH_MODE))
             tf.logging.info("***********TF_JIT_PROFILING {}***********".format(TF_JIT_PROFILING))
             tf.logging.info("***********PAI_ENABLE_HLO_DUMPER {}***********".format(PAI_ENABLE_HLO_DUMPER))
+
             self.strategy = None
             if self.config.num_gpus >= 1 and self.config.num_workers >= 1 and \
                     (self.config.distribution_strategy == "ExascaleStrategy" or
                      self.config.distribution_strategy == "CollectiveAllReduceStrategy"):
 
-                if FLAGS.usePAI:
+                if "PAI" in tf.__version__:
                     import pai
                     worker_hosts = self.config.worker_hosts.split(',')
                     tf.logging.info("***********Job Name is {}***********".format(self.config.job_name))
@@ -283,21 +300,25 @@ class EzTransEstimator(object):
                                                  worker_hosts,
                                                  has_evaluator=self.config.pull_evaluation_in_multiworkers_training)
 
-
                 if self.config.distribution_strategy == "ExascaleStrategy":
                     tf.logging.info("*****************Using ExascaleStrategy*********************")
-                    if FLAGS.usePAI:
+                    if "PAI" in tf.__version__:
+                        tf.logging.info("***********ESS_COMMUNICATION_NUM_COMMUNICATORS {}***********".format(
+                            self.config.num_communicators))
+                        tf.logging.info(
+                            "***********ESS_COMMUNICATION_NUM_SPLITS {}***********".format(self.config.num_splits))
+                        import pai
                         self.strategy = pai.distribute.ExascaleStrategy(num_gpus=self.config.num_gpus,
                                                                         num_micro_batches=self.config.num_accumulated_batches,
-                                                                        max_splits=1,
-                                                                        enable_sparse_allreduce=False)
+                                                                        num_communicators=self.config.num_communicators,
+                                                                        max_splits=self.config.num_splits)
                     else:
-                        raise ValueError("Please set usePAI is True")
+                        raise ValueError("Please run ExascaleStrategy in DLC")
 
                 elif self.config.distribution_strategy == "CollectiveAllReduceStrategy":
                     tf.logging.info("*****************Using CollectiveAllReduceStrategy*********************")
-                    if FLAGS.usePAI:
-                        cross_tower_ops_type = "default"
+                    if "PAI" in tf.__version__:
+                        cross_tower_ops_type = "horovod"
                         tf.logging.info("*****************cross_tower_ops_type is {}*********************".format(
                             cross_tower_ops_type))
                         self.strategy = tf.contrib.distribute.CollectiveAllReduceStrategy(
@@ -314,13 +335,16 @@ class EzTransEstimator(object):
                 else:
                     real_num_workers = self.config.num_workers
 
-                global_batch_size = self.config.train_batch_size * self.config.num_gpus * real_num_workers
+                global_batch_size = self.config.train_batch_size * self.config.num_gpus * real_num_workers * self.config.num_accumulated_batches
 
 
             elif self.config.num_gpus > 1 and self.config.num_workers == 1 and \
                     self.config.distribution_strategy == "MirroredStrategy":
                 tf.logging.info("*****************Using MirroredStrategy*********************")
-                if FLAGS.usePAI:
+                if "PAI" in tf.__version__:
+                    tf.logging.info("*****************Using PAI MirroredStrategy*********************")
+                    if 'TF_CONFIG' in os.environ:
+                        del os.environ['TF_CONFIG']
                     from tensorflow.contrib.distribute.python import cross_tower_ops as cross_tower_ops_lib
                     cross_tower_ops = cross_tower_ops_lib.AllReduceCrossTowerOps('nccl')
                     self.strategy = tf.contrib.distribute.MirroredStrategy(
@@ -336,27 +360,27 @@ class EzTransEstimator(object):
             elif self.config.num_gpus >= 1 and self.config.num_workers >= 1 and \
                     self.config.distribution_strategy == "WhaleStrategy":
 
-                if FLAGS.usePAI:
+                if "PAI" in tf.__version__:
                     tf.logging.info("***********Job Name is {}***********".format(self.config.job_name))
                     tf.logging.info("***********Task Index is {}***********".format(self.config.task_index))
                     tf.logging.info("***********Worker Hosts is {}***********".format(self.config.worker_hosts))
 
                 tf.logging.info("*****************Using WhaleStrategy*********************")
                 WHALE_COMMUNICATION_SPARSE_AS_DENSE = "True"
-                WHALE_COMMUNICATION_NUM_COMMUNICATORS = "1"
-                WHALE_COMMUNICATION_NUM_SPLITS = "1"
                 WHALE_UNBALANCED_IO_SLICING = "True"
                 os.environ["WHALE_COMMUNICATION_SPARSE_AS_DENSE"] = WHALE_COMMUNICATION_SPARSE_AS_DENSE
-                os.environ["WHALE_COMMUNICATION_NUM_COMMUNICATORS"] = WHALE_COMMUNICATION_NUM_COMMUNICATORS
-                os.environ["WHALE_COMMUNICATION_NUM_SPLITS"] = WHALE_COMMUNICATION_NUM_SPLITS
+                os.environ["WHALE_COMMUNICATION_NUM_COMMUNICATORS"] = str(self.config.num_communicators)
+                os.environ["WHALE_COMMUNICATION_NUM_SPLITS"] = str(self.config.num_splits)
                 os.environ["WHALE_UNBALANCED_IO_SLICING"] = WHALE_UNBALANCED_IO_SLICING
                 tf.logging.info("***********WHALE_COMMUNICATION_SPARSE_AS_DENSE {}***********".format(WHALE_COMMUNICATION_SPARSE_AS_DENSE))
-                tf.logging.info("***********WHALE_COMMUNICATION_NUM_COMMUNICATORS {}***********".format(WHALE_COMMUNICATION_NUM_COMMUNICATORS))
-                tf.logging.info("***********WHALE_COMMUNICATION_NUM_SPLITS {}***********".format(WHALE_COMMUNICATION_NUM_SPLITS))
+                tf.logging.info("***********WHALE_COMMUNICATION_NUM_COMMUNICATORS {}***********".format(self.config.num_communicators))
+                tf.logging.info("***********WHALE_COMMUNICATION_NUM_SPLITS {}***********".format(self.config.num_splits))
                 tf.logging.info("***********WHALE_UNBALANCED_IO_SLICING {}***********".format(WHALE_UNBALANCED_IO_SLICING))
                 global_batch_size = self.config.train_batch_size * self.config.num_accumulated_batches * self.config.num_model_replica
 
             elif self.config.num_gpus == 1 and self.config.num_workers == 1:
+                if 'TF_CONFIG' in os.environ:
+                    del os.environ['TF_CONFIG']
                 global_batch_size = self.config.train_batch_size * self.config.num_accumulated_batches
                 tf.logging.info("***********Single worker, Single gpu, Don't use distribution strategy***********")
 
@@ -504,9 +528,11 @@ class EzTransEstimator(object):
             if mode == tf.estimator.ModeKeys.TRAIN:
                 logits, labels = self.build_logits(features, mode=mode)
                 total_loss = self.build_loss(logits, labels)
+                num_towers = self.config.num_workers * self.config.num_gpus
                 train_op = get_train_op(learning_rate=self.config.learning_rate,
                                         weight_decay_ratio=self.config.weight_decay_ratio,
                                         loss=total_loss,
+                                        num_towers=num_towers,
                                         lr_decay=self.config.lr_decay,
                                         warmup_ratio=self.config.warmup_ratio,
                                         optimizer_name=self.config.optimizer,
@@ -523,7 +549,8 @@ class EzTransEstimator(object):
                 avgloss_hook = avgloss_logger_hook(self.train_steps,
                                                    total_loss,
                                                    self.model_dir,
-                                                   self.config.log_step_count_steps)
+                                                   self.config.log_step_count_steps,
+                                                   self.config.task_index)
 
                 summary_hook = tf.train.SummarySaverHook(save_steps=100, summary_op=tf.summary.merge_all())
                 return tf.estimator.EstimatorSpec(
@@ -574,6 +601,7 @@ class EzTransEstimator(object):
                                           steps=self.num_eval_steps,
                                           throttle_secs=self.throttle_secs)
 
+        tf.logging.info("*********Calling tf.estimator.train_and_evaluate *********")
         tf.estimator.train_and_evaluate(self.estimator,
                                         train_spec=train_spec,
                                         eval_spec=eval_spec)
@@ -667,15 +695,16 @@ class base_model(EzTransEstimator):
                     raise RuntimeError
 
             if "predict" in FLAGS.mode:
-                model_ckpt = config_json['predict_config']['predict_checkpoint_path'].split("/")[-1]
-                config_fp = config_json['predict_config']['predict_checkpoint_path'].replace(model_ckpt,
-                                                                                             "train_config.json")
+                if config_json['predict_config'].get('predict_checkpoint_path', None) is not None:
+                    model_ckpt = config_json['predict_config']['predict_checkpoint_path'].split("/")[-1]
+                    config_fp = config_json['predict_config']['predict_checkpoint_path'].replace(model_ckpt,
+                                                                                                 "train_config.json")
+                    if tf.gfile.Exists(config_fp):
+                        with tf.gfile.Open(config_fp, "r") as f:
+                            saved_config = json.load(f)
+                            model_config = saved_config.get("model_config", None)
+                            config_json["model_config"] = model_config
 
-                if tf.gfile.Exists(config_fp):
-                    with tf.gfile.Open(config_fp, "r") as f:
-                        saved_config = json.load(f)
-                        model_config = saved_config.get("model_config", None)
-                        config_json["model_config"] = model_config
             self.config = Config(mode=FLAGS.mode, config_json=config_json)
 
             if "train" in FLAGS.mode:
