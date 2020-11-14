@@ -174,8 +174,6 @@ class PairedClassificationRegressionPreprocessor(ClassificationRegressionPreproc
             self.feature_value_types = [tf.int64] * 6 + [tf.float32]
 
     def convert_example_to_features(self, items):
-        import pdb
-        pdb.set_trace()
         """ Convert single example to classifcation/regression features
 
         Args:
