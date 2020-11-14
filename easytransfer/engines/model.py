@@ -57,7 +57,7 @@ class Config(object):
         self.job_name = str(config_json["job_name"])
         self.num_gpus = int(config_json["num_gpus"])
         self.num_workers = int(config_json["num_workers"])
-        if "PAI" not in tf.__version__:
+        if "oss://" not in FLAGS.modelZooBasePath:
             FLAGS.modelZooBasePath = config_json.get("modelZooBasePath", os.path.join(os.getenv("HOME"), ".eztransfer_modelzoo"))
         tf.logging.info("***************** modelZooBasePath {} ***************".format(FLAGS.modelZooBasePath))
         if self.mode == 'train' or self.mode == "train_and_evaluate" \
