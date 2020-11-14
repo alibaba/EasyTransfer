@@ -108,7 +108,7 @@ class PreprocessorConfig(object):
         # configurate tokenizer
         pretrain_model_name_or_path = kwargs['pretrain_model_name_or_path']
 
-        if "PAI" not in tf.__version__ and "/" not in pretrain_model_name_or_path:
+        if "/" not in pretrain_model_name_or_path:
             model_type = pretrain_model_name_or_path.split("-")[1]
             if six.PY2:
                 import errno
