@@ -14,7 +14,7 @@ requirements = ['numpy',
 setup(
     # Metadata
     name='easytransfer',
-    version='0.1.1',
+    version='0.1.2',
     python_requires='>=2.7,>=3.6',
     author='PAI NLP',
     author_email='minghui.qmh@alibaba-inc.com,'
