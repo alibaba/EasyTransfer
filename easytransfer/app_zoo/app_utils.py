@@ -26,13 +26,13 @@ from easytransfer.preprocessors.tokenization import convert_to_unicode
 def get_reader_fn():
     """ Automatically  get ez_transfer's reader for different env
     """
-    return OdpsTableReader if FLAGS.usePAI else CSVReader
+    return OdpsTableReader if "PAI" in tf.__version__ else CSVReader
 
 
 def get_writer_fn():
     """ Automatically  get ez_transfer's writer for different env
     """
-    return OdpsTableWriter if FLAGS.usePAI else CSVWriter
+    return OdpsTableWriter if "PAI" in tf.__version__ else CSVWriter
 
 
 

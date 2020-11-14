@@ -55,7 +55,7 @@ class BertFeatConfig(Config):
             It adapts user command args to configuration protocol of `ez_transfer` engine
         """
         self.mode = "predict_on_the_fly"
-        if FLAGS.usePAI:
+        if "PAI" in tf.__version__:
             input_table = FLAGS.tables
             output_table = FLAGS.outputs
         else:
@@ -89,7 +89,7 @@ class BertFeatConfig(Config):
             finetune_model_name = None
             train_model_config = None
 
-        if FLAGS.usePAI:
+        if "PAI" in tf.__version__:
             all_input_col_names = get_all_columns_name(input_table)
         else:
             all_input_col_names = set([t.split(":")[0] for t in _APP_FLAGS.inputSchema.split(",")])
@@ -101,7 +101,7 @@ class BertFeatConfig(Config):
         append_columns = [t for t in _APP_FLAGS.appendCols.split(",") if t and t in all_input_col_names] \
                           if _APP_FLAGS.appendCols else []
         tf.logging.info(input_table)
-        if FLAGS.usePAI:
+        if "PAI" in tf.__version__:
             selected_cols_set = [first_sequence]
             if second_sequence:
                 selected_cols_set.append(second_sequence)
