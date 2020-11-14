@@ -158,9 +158,10 @@ class Config(object):
             for key, val in config_json['model_config'].items():
                 setattr(self, key, val)
 
-            self.model_dir = str(config_json['train_config'].get('model_dir', None))
-            self.distribution_strategy = str(
-                config_json["train_config"].get('distribution_config', {}).get("distribution_strategy", None))
+            if "train_config" in config_json:
+                self.model_dir = str(config_json['train_config'].get('model_dir', None))
+                self.distribution_strategy = str(
+                    config_json["train_config"].get('distribution_config', {}).get("distribution_strategy", None))
             self.eval_batch_size = config_json['evaluate_config']['eval_batch_size']
             self.num_eval_steps = config_json['evaluate_config'].get('num_eval_steps', None)
             self.eval_input_fp = config_json['evaluate_config']['eval_input_fp']
