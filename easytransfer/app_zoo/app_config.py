@@ -56,7 +56,7 @@ class AppConfig(Config):
     def build_train_resource_files(self, flags):
         if not tf.gfile.Exists(flags.checkpointDir):
             tf.gfile.MakeDirs(flags.checkpointDir)
-        if not FLAGS.usePAI:
+        if not "PAI" in tf.__version__:
             with open(os.path.join(flags.checkpointDir, "train_config.json"), 'w') as f:
                 json.dump(self.__dict__, f)
         else:
@@ -70,10 +70,10 @@ class AppConfig(Config):
     def build_preprocess_config(self, flags):
         first_sequence, second_sequence, label_name = \
             flags.firstSequence, flags.secondSequence, flags.labelName
-        input_table = FLAGS.tables if FLAGS.usePAI else flags.inputTable
-        output_table = FLAGS.outputs if FLAGS.usePAI else flags.outputTable
+        input_table = FLAGS.tables if "PAI" in tf.__version__ else flags.inputTable
+        output_table = FLAGS.outputs if "PAI" in tf.__version__ else flags.outputTable
         append_columns = flags.appendCols.split(",") if flags.appendCols else []
-        if FLAGS.usePAI:
+        if "PAI" in tf.__version__:
             input_schema = get_selected_columns_schema(
                 input_table, set([first_sequence, second_sequence, label_name] + append_columns))
         else:
@@ -115,7 +115,7 @@ class AppConfig(Config):
         first_sequence, second_sequence, label_name = \
             flags.firstSequence, flags.secondSequence, flags.labelName
         label_enumerate_values = get_label_enumerate_values(flags.labelEnumerateValues)
-        if FLAGS.usePAI:
+        if "PAI" in tf.__version__:
             train_input_fp, eval_input_fp = FLAGS.tables.split(",")
             if first_sequence is None:
                 assert flags.sequenceLength is not None
@@ -186,7 +186,7 @@ class AppConfig(Config):
         if "pretrain_model_name_or_path" in config_json["model_config"]:
             pretrain_model_name_or_path = config_json["model_config"]["pretrain_model_name_or_path"]
             contrib_models_path = os.path.join(FLAGS.modelZooBasePath, "contrib_models.json")
-            if not FLAGS.usePAI and "oss://" in contrib_models_path:
+            if not "PAI" in tf.__version__ and "oss://" in contrib_models_path:
                 pass
             elif tf.gfile.Exists(contrib_models_path):
                 with tf.gfile.Open(os.path.join(FLAGS.modelZooBasePath, "contrib_models.json")) as f:
@@ -247,7 +247,7 @@ class AppConfig(Config):
         return config_json
 
     def build_evaluate_config(self, flags):
-        input_table = FLAGS.tables if FLAGS.usePAI else flags.inputTable
+        input_table = FLAGS.tables if "PAI" in tf.__version__ else flags.inputTable
         ckp_dir = os.path.dirname(flags.checkpointPath)
         train_config_path = os.path.join(ckp_dir, "train_config.json")
         if tf.gfile.Exists(train_config_path):
@@ -275,8 +275,8 @@ class AppConfig(Config):
         return config_json
 
     def build_predict_config(self, flags):
-        input_table = FLAGS.tables if FLAGS.usePAI else flags.inputTable
-        output_table = FLAGS.outputs if FLAGS.usePAI else flags.outputTable
+        input_table = FLAGS.tables if "PAI" in tf.__version__ else flags.inputTable
+        output_table = FLAGS.outputs if "PAI" in tf.__version__ else flags.outputTable
         ckp_dir = os.path.dirname(flags.checkpointPath) \
             if '/' in flags.checkpointPath else flags.checkpointPath
         train_config_path = os.path.join(ckp_dir, "train_config.json")
@@ -295,7 +295,7 @@ class AppConfig(Config):
         if flags.inputSchema:
             input_schema = flags.inputSchema
         else:
-            if FLAGS.usePAI:
+            if "PAI" in tf.__version__:
                 input_schema = get_selected_columns_schema(
                     input_table, set([first_sequence, second_sequence] + append_columns))
             else:
