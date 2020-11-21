@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/tianchi_benchmark/tianchi_datasets.tgz
+#please download dataset from tianchi 
 tar -zxf tianchi_datasets.tgz
 rm *.tgz
 
