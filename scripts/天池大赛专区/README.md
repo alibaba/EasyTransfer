@@ -76,8 +76,8 @@ https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#
 
 ## 环境配置
 以下教程是在linux系统中运行，其中涉及到模型下载，所以需要联网并安装有wget，其他python依赖包如下：    
-- tensorflow-gpu  1.12.0
-- easytransfer  0.1.1
+- tensorflow-gpu  1.12.3
+- easytransfer  0.1.2
 
 ## 文本目录结构
 ```
