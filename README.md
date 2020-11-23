@@ -172,3 +172,26 @@ Also we can scan the following QR code to join wechat discussion group.
 
 <img src="https://intranetproxy.alipay.com/skylark/lark/0/2020/jpeg/226643/1603306190699-56be6895-1287-42e3-b8a7-f957b1a4d7b7.jpeg#align=left&display=inline&height=352&margin=%5Bobject%20Object%5D&name=IMG_2129.JPG&originHeight=1178&originWidth=1016&size=312154&status=done&style=none&width=304" width="300"/>
 
+
+# Contact Us
+
+```bash
+@article{easytransfer,
+    author = {Minghui Qiu and 
+            Peng Li and 
+            Hanjie Pan and 
+            Chengyu Wang and 
+            Cen Chen and 
+            Yaliang Li and 
+            Dehong Gao and 
+            Jun Huang and 
+            Yong Li and 
+            Jun Yang and 
+            Deng Cai and 
+            Wei Lin},
+    title = {EasyTransfer - A Simple and Scalable Deep Transfer Learning Platform for NLP Applications
+},
+    journal = {arXiv:2011.09463},
+    year = {2020}
+}
+```
