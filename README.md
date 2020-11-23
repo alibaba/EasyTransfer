@@ -175,7 +175,7 @@ Also we can scan the following QR code to join wechat discussion group.
 
 # Contact Us
 
-```bash
+```text
 @article{easytransfer,
     author = {Minghui Qiu and 
             Peng Li and 
