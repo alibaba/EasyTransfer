@@ -162,6 +162,8 @@ AppZoo：[https://www.yuque.com/easytransfer/itfpm9/ky6hky](https://www.yuque.co
 
 API docs：[http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_docs/html/index.html](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_docs/html/index.html)
 
+Reference Docs: [https://docs.contour.so/alibaba/EasyTransfer/getting-started](https://docs.contour.so/alibaba/EasyTransfer/getting-started)
+
 
 # Contact Us
 Scan the following QR codes to join Dingtalk discussion group. The group discussions are most in Chinese, but English is also welcomed.
