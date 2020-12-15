@@ -192,6 +192,7 @@ Also we can scan the following QR code to join wechat discussion group.
     title = {EasyTransfer - A Simple and Scalable Deep Transfer Learning Platform for NLP Applications
 },
     journal = {arXiv:2011.09463},
+    url = {https://arxiv.org/abs/2011.09463},
     year = {2020}
 }
 ```
