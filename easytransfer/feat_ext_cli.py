@@ -20,9 +20,6 @@ import json
 import os
 import tensorflow as tf
 from easytransfer import Config, FLAGS
-from easytransfer.model_zoo.modeling_albert import ALBERT_PRETRAINED_MODEL_ARCHIVE_MAP
-from easytransfer.model_zoo.modeling_bert import BERT_PRETRAINED_MODEL_ARCHIVE_MAP
-from easytransfer.model_zoo.modeling_roberta import ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP
 from easytransfer.app_zoo.app_utils import get_all_columns_name, get_selected_columns_schema
 from easytransfer.app_zoo.feature_extractor import BertFeatureExtractor
 
@@ -55,23 +52,11 @@ class BertFeatConfig(Config):
             It adapts user command args to configuration protocol of `ez_transfer` engine
         """
         self.mode = "predict_on_the_fly"
-        if "PAI" in tf.__version__:
-            input_table = FLAGS.tables
-            output_table = FLAGS.outputs
-        else:
-            input_table = _APP_FLAGS.inputTable
-            output_table = _APP_FLAGS.outputTable
 
-        all_pretrain_model_archive_map = dict()
-        all_pretrain_model_archive_map.update(ALBERT_PRETRAINED_MODEL_ARCHIVE_MAP)
-        all_pretrain_model_archive_map.update(BERT_PRETRAINED_MODEL_ARCHIVE_MAP)
-        all_pretrain_model_archive_map.update(ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP)
-        if _APP_FLAGS.modelName not in all_pretrain_model_archive_map:
-            predict_checkpoint_path = _APP_FLAGS.modelName
-        else:
-            predict_checkpoint_path = os.path.join(
-                FLAGS.modelZooBasePath,
-                os.path.dirname(all_pretrain_model_archive_map[_APP_FLAGS.modelName]))
+        input_table = _APP_FLAGS.inputTable
+        output_table = _APP_FLAGS.outputTable
+
+        predict_checkpoint_path = _APP_FLAGS.modelName
 
         predict_checkpoint_dir = os.path.dirname(predict_checkpoint_path)
         if tf.gfile.Exists(os.path.join(predict_checkpoint_dir, "train_config.json")):
@@ -89,7 +74,7 @@ class BertFeatConfig(Config):
             finetune_model_name = None
             train_model_config = None
 
-        if "PAI" in tf.__version__:
+        if "odps://" in FLAGS.inputTable and "PAI" in tf.__version__:
             all_input_col_names = get_all_columns_name(input_table)
         else:
             all_input_col_names = set([t.split(":")[0] for t in _APP_FLAGS.inputSchema.split(",")])
@@ -101,7 +86,7 @@ class BertFeatConfig(Config):
         append_columns = [t for t in _APP_FLAGS.appendCols.split(",") if t and t in all_input_col_names] \
                           if _APP_FLAGS.appendCols else []
         tf.logging.info(input_table)
-        if "PAI" in tf.__version__:
+        if "odps://" in FLAGS.inputTable and "PAI" in tf.__version__:
             selected_cols_set = [first_sequence]
             if second_sequence:
                 selected_cols_set.append(second_sequence)

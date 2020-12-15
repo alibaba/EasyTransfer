@@ -14,10 +14,11 @@
 # limitations under the License.
 
 import sys
+
 if sys.version_info.major == 2:
-  import Queue as queue
+    import Queue as queue
 else:
-  import queue
+    import queue
 import traceback
 import tensorflow as tf
 from tensorflow.python.saved_model.signature_constants import DEFAULT_SERVING_SIGNATURE_DEF_KEY
@@ -29,6 +30,7 @@ from easytransfer.preprocessors.deeptext_preprocessor import DeepTextPreprocesso
 
 class PredictProcess(distribution.Process):
     """ Prediction process for tf saved model """
+
     def __init__(self,
                  saved_model_path,
                  thread_num=1,
@@ -78,6 +80,7 @@ class PredictProcess(distribution.Process):
 
 class AppPredictor(object):
     """ Application predictor (support distributed predicting) """
+
     def __init__(self, config, input_keys, output_keys,
                  thread_num=1, queue_size=256, job_name="app_predictor"):
 
@@ -91,19 +94,19 @@ class AppPredictor(object):
         self.job_name = job_name
 
     def get_default_reader(self):
-        return get_reader_fn()(input_glob=self.config.predict_input_fp,
-                               input_schema=self.config.input_schema,
-                               is_training=False,
-                               batch_size=self.config.predict_batch_size,
-                               output_queue=queue.Queue(),
-                               slice_id=self.worker_id,
-                               slice_count=self.num_workers)
+        return get_reader_fn(self.config.predict_input_fp)(input_glob=self.config.predict_input_fp,
+                                                           input_schema=self.config.input_schema,
+                                                           is_training=False,
+                                                           batch_size=self.config.predict_batch_size,
+                                                           output_queue=queue.Queue(),
+                                                           slice_id=self.worker_id,
+                                                           slice_count=self.num_workers)
 
     def get_default_writer(self):
-        return get_writer_fn()(output_glob=self.config.predict_output_fp,
-                               output_schema=self.config.output_schema,
-                               slice_id=self.worker_id,
-                               input_queue=queue.Queue())
+        return get_writer_fn(self.config.predict_output_fp)(output_glob=self.config.predict_output_fp,
+                                                            output_schema=self.config.output_schema,
+                                                            slice_id=self.worker_id,
+                                                            input_queue=queue.Queue())
 
     def get_default_preprocessor(self):
         if hasattr(self.config, "model_name"):
@@ -113,13 +116,13 @@ class AppPredictor(object):
         if app_model_name == "feat_ext_bert":
             app_model_name = "text_classify_bert"
         return preprocessors.get_preprocessor(
-                self.config.pretrain_model_name_or_path,
-                thread_num=self.thread_num,
-                input_queue=queue.Queue(),
-                output_queue=queue.Queue(),
-                preprocess_batch_size=self.config.predict_batch_size,
-                user_defined_config=self.config,
-                app_model_name=app_model_name)
+            self.config.pretrain_model_name_or_path,
+            thread_num=self.thread_num,
+            input_queue=queue.Queue(),
+            output_queue=queue.Queue(),
+            preprocess_batch_size=self.config.predict_batch_size,
+            user_defined_config=self.config,
+            app_model_name=app_model_name)
 
     def get_default_postprocessor(self):
         if hasattr(self.config, "label_enumerate_values"):
@@ -131,12 +134,12 @@ class AppPredictor(object):
         else:
             app_model_name = None
         return postprocessors.get_postprocessors(
-                label_enumerate_values=label_enumerate_values,
-                output_schema=self.config.output_schema,
-                thread_num=self.thread_num,
-                input_queue=queue.Queue(),
-                output_queue=queue.Queue(),
-                app_model_name=app_model_name)
+            label_enumerate_values=label_enumerate_values,
+            output_schema=self.config.output_schema,
+            thread_num=self.thread_num,
+            input_queue=queue.Queue(),
+            output_queue=queue.Queue(),
+            app_model_name=app_model_name)
 
     def get_predictor(self):
         predictor = PredictProcess(saved_model_path=self.config.predict_checkpoint_path,
@@ -175,10 +178,10 @@ class AppPredictor(object):
 def run_app_predictor(config):
     try:
         if config.model_name == "feat_ext_bert":
-            predictor =  AppPredictor(config,
-                                      input_keys=["input_ids", "input_mask", "segment_ids"],
-                                      output_keys=["pool_output", "first_token_output", "all_hidden_outputs"],
-                                      job_name="ez_bert_feat")
+            predictor = AppPredictor(config,
+                                     input_keys=["input_ids", "input_mask", "segment_ids"],
+                                     output_keys=["pool_output", "first_token_output", "all_hidden_outputs"],
+                                     job_name="ez_bert_feat")
             predictor.run_predict()
         elif config.model_name in ["text_comprehension_bert", "text_comprehension_bert_hae"]:
             input_keys = ["input_ids", "input_mask", "segment_ids"] if config.model_name == "text_comprehension_bert" \

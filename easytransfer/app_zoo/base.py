@@ -44,27 +44,28 @@ class ApplicationModel(base_model):
         getattr(self, self.config.mode.replace("_on_the_fly", ""))()
 
     def train(self):
-        train_reader = get_reader_fn()(input_glob=self.config.train_input_fp,
-                                       is_training=True,
-                                       input_schema=self.config.input_schema,
-                                       batch_size=self.config.train_batch_size,
-                                       distribution_strategy=self.config.distribution_strategy)
+        train_reader = get_reader_fn(self.config.train_input_fp)(
+            input_glob=self.config.train_input_fp,
+            is_training=True,
+            input_schema=self.config.input_schema,
+            batch_size=self.config.train_batch_size,
+            distribution_strategy=self.config.distribution_strategy)
         self.run_train(reader=train_reader)
 
     def train_and_evaluate(self):
         shuffle_buffer_size = self.config.shuffle_buffer_size if \
             hasattr(self.config, "shuffle_buffer_size") else None
-        train_reader = get_reader_fn()(input_glob=self.config.train_input_fp,
-                                       is_training=True,
-                                       input_schema=self.config.input_schema,
-                                       batch_size=self.config.train_batch_size,
-                                       distribution_strategy=self.config.distribution_strategy,
-                                       shuffle_buffer_size=shuffle_buffer_size)
+        train_reader = get_reader_fn(self.config.train_input_fp)(input_glob=self.config.train_input_fp,
+                                                                 is_training=True,
+                                                                 input_schema=self.config.input_schema,
+                                                                 batch_size=self.config.train_batch_size,
+                                                                 distribution_strategy=self.config.distribution_strategy,
+                                                                 shuffle_buffer_size=shuffle_buffer_size)
 
-        eval_reader = get_reader_fn()(input_glob=self.config.eval_input_fp,
-                                      is_training=False,
-                                      input_schema=self.config.input_schema,
-                                      batch_size=self.config.eval_batch_size)
+        eval_reader = get_reader_fn(self.config.eval_input_fp)(input_glob=self.config.eval_input_fp,
+                                                               is_training=False,
+                                                               input_schema=self.config.input_schema,
+                                                               batch_size=self.config.eval_batch_size)
 
         if hasattr(self.config, "export_best_checkpoint") and self.config.export_best_checkpoint:
             tf.logging.info("First train, then search for best checkpoint...")
@@ -131,28 +132,28 @@ class ApplicationModel(base_model):
             tf.logging.info(str(e))
 
     def evaluate(self):
-        eval_reader = get_reader_fn()(input_glob=self.config.eval_input_fp,
-                                      input_schema=self.config.input_schema,
-                                      is_training=False,
-                                      batch_size=self.config.eval_batch_size)
+        eval_reader = get_reader_fn(self.config.eval_input_fp)(input_glob=self.config.eval_input_fp,
+                                                               input_schema=self.config.input_schema,
+                                                               is_training=False,
+                                                               batch_size=self.config.eval_batch_size)
 
         self.run_evaluate(reader=eval_reader, checkpoint_path=self.config.eval_ckpt_path)
 
     def predict(self):
         if ".ckpt" in self.config.predict_checkpoint_path:
-            predict_reader = get_reader_fn()(input_glob=self.config.predict_input_fp,
-                                             batch_size=self.config.predict_batch_size,
-                                             is_training=False,
-                                             input_schema=self.config.input_schema)
+            predict_reader = get_reader_fn(self.config.predict_input_fp)(input_glob=self.config.predict_input_fp,
+                                                                         batch_size=self.config.predict_batch_size,
+                                                                         is_training=False,
+                                                                         input_schema=self.config.input_schema)
 
-            predict_writer = get_writer_fn()(output_glob=self.config.predict_output_fp,
-                                             output_schema=self.config.output_schema,
-                                             slice_id=0,
-                                             input_queue=None)
+            predict_writer = get_writer_fn(self.config.predict_output_fp)(output_glob=self.config.predict_output_fp,
+                                                                          output_schema=self.config.output_schema,
+                                                                          slice_id=0,
+                                                                          input_queue=None)
 
             self.run_predict(predict_reader,
-                            predict_writer,
-                            checkpoint_path=self.config.predict_checkpoint_path)
+                             predict_writer,
+                             checkpoint_path=self.config.predict_checkpoint_path)
         else:
             self.config.mode = "predict_on_the_fly"
             self.mode = "predict_on_the_fly"
@@ -195,11 +196,11 @@ class ApplicationModel(base_model):
             from easytransfer.preprocessors.deeptext_preprocessor import DeepTextVocab
 
             vocab = DeepTextVocab()
-            reader = get_reader_fn()(input_glob=self.config.train_input_fp,
-                                     is_training=False,
-                                     input_schema=self.config.input_schema,
-                                     batch_size=self.config.train_batch_size,
-                                     distribution_strategy=self.config.distribution_strategy)
+            reader = get_reader_fn(self.config.train_input_fp)(input_glob=self.config.train_input_fp,
+                                                               is_training=False,
+                                                               input_schema=self.config.input_schema,
+                                                               batch_size=self.config.train_batch_size,
+                                                               distribution_strategy=self.config.distribution_strategy)
             for batch_idx, outputs in enumerate(self.estimator.predict(input_fn=reader.get_input_fn(),
                                                                        yield_single_examples=False,
                                                                        checkpoint_path=None)):

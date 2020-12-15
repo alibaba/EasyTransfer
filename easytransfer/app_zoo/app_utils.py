@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 import re
 import time
@@ -23,17 +24,53 @@ from easytransfer.model_zoo.modeling_bert import BERT_PRETRAINED_MODEL_ARCHIVE_M
 from easytransfer.preprocessors.tokenization import convert_to_unicode
 
 
-def get_reader_fn():
+def copy_pretrain_model_files_to_dir(pretrain_model_name_or_path, output_dir):
+    if pretrain_model_name_or_path not in BERT_PRETRAINED_MODEL_ARCHIVE_MAP:
+        pretrain_checkpoint_path = pretrain_model_name_or_path
+    else:
+        pretrain_checkpoint_path = os.path.join(
+            FLAGS.modelZooBasePath, BERT_PRETRAINED_MODEL_ARCHIVE_MAP[pretrain_model_name_or_path])
+    predict_checkpoint_dir = os.path.dirname(pretrain_checkpoint_path)
+    vocab_file = os.path.join(predict_checkpoint_dir, "vocab.txt")
+    vocab_out_file = os.path.join(output_dir, "vocab.txt")
+    if tf.gfile.Exists(vocab_file) and not tf.gfile.Exists(vocab_out_file):
+        tf.gfile.Copy(vocab_file, vocab_out_file)
+    config_file = os.path.join(predict_checkpoint_dir, "config.json")
+    config_out_file = os.path.join(output_dir, "config.json")
+    if tf.gfile.Exists(config_file) and not tf.gfile.Exists(config_out_file):
+        tf.gfile.Copy(config_file, config_out_file)
+
+
+def copy_file_to_new_path(old_dir, new_dir, fname, newfname=None):
+    newfname = newfname if newfname else fname
+    src_path = os.path.join(old_dir, fname)
+    tgt_path = os.path.join(new_dir, newfname)
+    if tf.gfile.Exists(src_path) and not tf.gfile.Exists(tgt_path):
+        tf.gfile.Copy(src_path, tgt_path)
+
+
+def get_reader_fn(input_fp=None):
     """ Automatically  get ez_transfer's reader for different env
     """
-    return OdpsTableReader if "PAI" in tf.__version__ else CSVReader
+    if input_fp is None:
+        return OdpsTableReader if "PAI" in tf.__version__ else CSVReader
+
+    if "odps://" in input_fp:
+        return OdpsTableReader
+    else:
+        return CSVReader
 
 
-def get_writer_fn():
+def get_writer_fn(output_fp=None):
     """ Automatically  get ez_transfer's writer for different env
     """
-    return OdpsTableWriter if "PAI" in tf.__version__ else CSVWriter
+    if output_fp is None:
+        return OdpsTableWriter if "PAI" in tf.__version__ else CSVWriter
 
+    if "odps://" in output_fp:
+        return OdpsTableWriter
+    else:
+        return CSVWriter
 
 
 def get_all_columns_name(input_glob):
@@ -98,34 +135,11 @@ def get_selected_columns_schema(input_glob, selected_columns):
 # Parse advanced user defined params
 def get_user_defined_prams_dict(user_defined_params_str):
     _user_param_dict = dict()
-    for item in re.findall("\w+=[\w/.\-:\/]+", user_defined_params_str):
+    for item in re.findall("\w+=[\w/.,\-:\/]+", user_defined_params_str):
         key, val = item.strip().split("=")
         _user_param_dict[key] = val
     return _user_param_dict
 
-
-def copy_pretrain_model_files_to_dir(pretrain_model_name_or_path, output_dir):
-    if pretrain_model_name_or_path not in BERT_PRETRAINED_MODEL_ARCHIVE_MAP:
-        pretrain_checkpoint_path = pretrain_model_name_or_path
-    else:
-        pretrain_checkpoint_path = os.path.join(
-            FLAGS.modelZooBasePath, BERT_PRETRAINED_MODEL_ARCHIVE_MAP[pretrain_model_name_or_path])
-    predict_checkpoint_dir = os.path.dirname(pretrain_checkpoint_path)
-    vocab_file = os.path.join(predict_checkpoint_dir, "vocab.txt")
-    vocab_out_file = os.path.join(output_dir, "vocab.txt")
-    if tf.gfile.Exists(vocab_file) and not tf.gfile.Exists(vocab_out_file):
-        tf.gfile.Copy(vocab_file, vocab_out_file)
-    config_file = os.path.join(predict_checkpoint_dir, "config.json")
-    config_out_file = os.path.join(output_dir, "config.json")
-    if tf.gfile.Exists(config_file) and not tf.gfile.Exists(config_out_file):
-        tf.gfile.Copy(config_file, config_out_file)
-
-def copy_file_to_new_path(old_dir, new_dir, fname, newfname=None):
-    newfname = newfname if newfname else fname
-    src_path = os.path.join(old_dir, fname)
-    tgt_path = os.path.join(new_dir, newfname)
-    if tf.gfile.Exists(src_path) and not tf.gfile.Exists(tgt_path):
-        tf.gfile.Copy(src_path, tgt_path)
 
 def get_label_enumerate_values(label_enumerate_value_or_path):
     if label_enumerate_value_or_path is None:
@@ -136,6 +150,16 @@ def get_label_enumerate_values(label_enumerate_value_or_path):
     else:
         label_enumerate_value = label_enumerate_value_or_path
     return label_enumerate_value
+
+
+def get_pretrain_model_name_or_path(pretrain_model_name_or_path):
+    contrib_models_path = os.path.join(FLAGS.modelZooBasePath, "contrib_models.json")
+    if tf.gfile.Exists(contrib_models_path):
+        with tf.gfile.Open(os.path.join(FLAGS.modelZooBasePath, "contrib_models.json")) as f:
+            contrib_models = json.load(f)
+        if pretrain_model_name_or_path in contrib_models:
+            pretrain_model_name_or_path = contrib_models[pretrain_model_name_or_path]
+    return pretrain_model_name_or_path
 
 
 def log_duration_time(func):

@@ -35,13 +35,13 @@ class SerializationModel(ApplicationModel):
         num_workers = len(self.config.worker_hosts.split(","))
         proc_executor = distribution.ProcessExecutor(self.queue_size)
 
-        reader = get_reader_fn()(input_glob=self.config.preprocess_input_fp,
-                                 input_schema=self.config.input_schema,
-                                 is_training=False,
-                                 batch_size=self.config.preprocess_batch_size,
-                                 slice_id=worker_id,
-                                 slice_count=num_workers,
-                                 output_queue=proc_executor.get_output_queue())
+        reader = get_reader_fn(self.config.preprocess_input_fp)(input_glob=self.config.preprocess_input_fp,
+                                                                input_schema=self.config.input_schema,
+                                                                is_training=False,
+                                                                batch_size=self.config.preprocess_batch_size,
+                                                                slice_id=worker_id,
+                                                                slice_count=num_workers,
+                                                                output_queue=proc_executor.get_output_queue())
 
         proc_executor.add(reader)
         preprocessor = preprocessors.get_preprocessor(
@@ -53,10 +53,10 @@ class SerializationModel(ApplicationModel):
             user_defined_config=self.config,
             app_model_name=self.config.app_model_name)
         proc_executor.add(preprocessor)
-        writer = get_writer_fn()(output_glob=self.config.preprocess_output_fp,
-                                 output_schema=self.config.output_schema,
-                                 slice_id=worker_id,
-                                 input_queue=proc_executor.get_input_queue())
+        writer = get_writer_fn(self.config.preprocess_output_fp)(output_glob=self.config.preprocess_output_fp,
+                                                                 output_schema=self.config.output_schema,
+                                                                 slice_id=worker_id,
+                                                                 input_queue=proc_executor.get_input_queue())
 
         proc_executor.add(writer)
         proc_executor.run()

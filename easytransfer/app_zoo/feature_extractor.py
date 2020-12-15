@@ -48,7 +48,8 @@ class BertFeatureExtractor(ApplicationModel):
                 bert_backbone = model_zoo.get_pretrained_model(self.config.pretrain_model_name_or_path)
                 sequence_output, pooled_output = bert_backbone(
                     [input_ids, input_mask, segment_ids], output_features=True, mode=mode)
-                if hasattr(self.config, "projection_dim") and self.config.projection_dim != 1:
+
+                if hasattr(self.config, "projection_dim") and self.config.projection_dim != -1:
                     first_token_output_a = sequence_output[:, 0, :]
 
                     pooled_output = tf.layers.dense(inputs=first_token_output_a, units=self.config.projection_dim,

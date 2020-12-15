@@ -227,7 +227,7 @@ class TestEzTextClassify(unittest.TestCase):
                  '--advancedParameters', """'
                                 fix_embedding=false
                                 max_vocab_size=20000
-                                num_filters=100
+                                num_filters=100,100,100
                                 filter_sizes=3,4,5
                                 dropout_rate=0.5
 

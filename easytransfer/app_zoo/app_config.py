@@ -19,7 +19,8 @@ import tensorflow as tf
 from easytransfer import Config, FLAGS
 from easytransfer.app_zoo import _name_to_app_model
 from easytransfer.app_zoo.app_utils import get_selected_columns_schema, \
-    get_user_defined_prams_dict, copy_pretrain_model_files_to_dir, get_label_enumerate_values
+    get_user_defined_prams_dict, copy_pretrain_model_files_to_dir, get_label_enumerate_values, \
+    get_pretrain_model_name_or_path
 
 
 class AppConfig(Config):
@@ -50,39 +51,40 @@ class AppConfig(Config):
         config_json["num_workers"] = FLAGS.workerCount
         super(AppConfig, self).__init__(mode=internal_mode, config_json=config_json)
 
-        if mode == "train":
+        if mode == "train" and FLAGS.task_index == 0:
             self.build_train_resource_files(flags)
 
     def build_train_resource_files(self, flags):
         if not tf.gfile.Exists(flags.checkpointDir):
             tf.gfile.MakeDirs(flags.checkpointDir)
-        if not "PAI" in tf.__version__:
-            with open(os.path.join(flags.checkpointDir, "train_config.json"), 'w') as f:
-                json.dump(self.__dict__, f)
-        else:
-            from tensorflow.python.platform import gfile
-            if not tf.gfile.Exists(os.path.join(flags.checkpointDir, "train_config.json")):
-                with gfile.GFile(os.path.join(flags.checkpointDir, "train_config.json"), mode='w') as f:
-                    json.dump(self.__dict__, f)
+        with tf.gfile.GFile(os.path.join(flags.checkpointDir, "train_config.json"), mode='w') as f:
+            json.dump(self.__dict__, f)
         if hasattr(self, "pretrain_model_name_or_path"):
             copy_pretrain_model_files_to_dir(self.pretrain_model_name_or_path, flags.checkpointDir)
 
     def build_preprocess_config(self, flags):
         first_sequence, second_sequence, label_name = \
             flags.firstSequence, flags.secondSequence, flags.labelName
-        input_table = FLAGS.tables if "PAI" in tf.__version__ else flags.inputTable
-        output_table = FLAGS.outputs if "PAI" in tf.__version__ else flags.outputTable
+        input_table = flags.inputTable
+        output_table = flags.outputTable
         append_columns = flags.appendCols.split(",") if flags.appendCols else []
-        if "PAI" in tf.__version__:
+
+        user_param_dict = get_user_defined_prams_dict(flags.advancedParameters)
+
+        if "odps://" in input_table and "PAI" in tf.__version__:
+            selected_columns = [first_sequence, second_sequence, label_name] + append_columns
+            for key, val in user_param_dict.items():
+                if key.endswith("column_name"):
+                    selected_columns.append(val)
+            selected_columns = set(selected_columns)
             input_schema = get_selected_columns_schema(
-                input_table, set([first_sequence, second_sequence, label_name] + append_columns))
+                input_table, selected_columns)
         else:
             input_schema = flags.inputSchema
         output_schema = flags.outputSchema
         for column_name in append_columns:
             output_schema += "," + column_name
 
-        user_param_dict = get_user_defined_prams_dict(flags.advancedParameters)
         if flags.modelName in _name_to_app_model:
             tokenizer_name_or_path = user_param_dict.get("tokenizer_name_or_path", "google-bert-base-zh")
             setattr(self, "model_name", "serialization")
@@ -91,6 +93,7 @@ class AppConfig(Config):
             tokenizer_name_or_path = flags.modelName
             setattr(self, "model_name", "serialization")
             setattr(self, "app_model_name", "text_classify_bert")
+
         config_json = {
             "preprocess_config": {
                 "preprocess_input_fp": input_table,
@@ -115,19 +118,29 @@ class AppConfig(Config):
         first_sequence, second_sequence, label_name = \
             flags.firstSequence, flags.secondSequence, flags.labelName
         label_enumerate_values = get_label_enumerate_values(flags.labelEnumerateValues)
-        if "PAI" in tf.__version__:
-            train_input_fp, eval_input_fp = FLAGS.tables.split(",")
+
+        user_param_dict = get_user_defined_prams_dict(flags.advancedParameters)
+        tf.logging.info(user_param_dict)
+
+        train_input_fp, eval_input_fp = FLAGS.inputTable.split(",")
+        train_input_fp, eval_input_fp = train_input_fp.strip(), eval_input_fp.strip()
+
+        if "odps://" in FLAGS.inputTable and "PAI" in tf.__version__:
             if first_sequence is None:
                 assert flags.sequenceLength is not None
                 input_schema = _name_to_app_model[flags.modelName].get_input_tensor_schema(
                     sequence_length=flags.sequenceLength)
             else:
+                selected_columns = [first_sequence, second_sequence, label_name]
+                for key, val in user_param_dict.items():
+                    if key.endswith("column_name"):
+                        selected_columns.append(val)
+                selected_columns = set(selected_columns)
                 input_schema = get_selected_columns_schema(
-                    train_input_fp, [first_sequence, second_sequence, label_name])
+                    train_input_fp, selected_columns)
         else:
-            train_input_fp, eval_input_fp = flags.inputTable.split(",")
             input_schema = flags.inputSchema
-        train_input_fp, eval_input_fp = train_input_fp.strip(), eval_input_fp.strip()
+
         # Parse args from APP's FLAGS
         config_json = {
             "preprocess_config": {
@@ -162,15 +175,10 @@ class AppConfig(Config):
             }
         }
 
-        tf.logging.info(flags.advancedParameters)
-
-        user_param_dict = get_user_defined_prams_dict(flags.advancedParameters)
-
-        tf.logging.info(user_param_dict)
         if flags.modelName in _name_to_app_model:
             default_model_params = _name_to_app_model[flags.modelName].default_model_params()
         else:
-            raise NotImplementedError
+            raise NotImplementedError("model %s not implemented" % flags.modelName)
         for key, _ in default_model_params.items():
             default_val = default_model_params[key]
             if key in user_param_dict:
@@ -184,15 +192,8 @@ class AppConfig(Config):
 
         config_json["model_config"]["num_labels"] = len(label_enumerate_values.split(","))
         if "pretrain_model_name_or_path" in config_json["model_config"]:
-            pretrain_model_name_or_path = config_json["model_config"]["pretrain_model_name_or_path"]
-            contrib_models_path = os.path.join(FLAGS.modelZooBasePath, "contrib_models.json")
-            if not "PAI" in tf.__version__ and "oss://" in contrib_models_path:
-                pass
-            elif tf.gfile.Exists(contrib_models_path):
-                with tf.gfile.Open(os.path.join(FLAGS.modelZooBasePath, "contrib_models.json")) as f:
-                    contrib_models = json.load(f)
-                if pretrain_model_name_or_path in contrib_models:
-                    pretrain_model_name_or_path = contrib_models[pretrain_model_name_or_path]
+            pretrain_model_name_or_path = get_pretrain_model_name_or_path(
+                config_json["model_config"]["pretrain_model_name_or_path"])
 
             config_json["model_config"]["pretrain_model_name_or_path"] = pretrain_model_name_or_path
             config_json["preprocess_config"]["tokenizer_name_or_path"] = pretrain_model_name_or_path
@@ -247,11 +248,19 @@ class AppConfig(Config):
         return config_json
 
     def build_evaluate_config(self, flags):
-        input_table = FLAGS.tables if "PAI" in tf.__version__ else flags.inputTable
-        ckp_dir = os.path.dirname(flags.checkpointPath)
+        input_table = flags.inputTable
+
+        if flags.modelName.startswith("modelhub"):
+            checkpoint_path = os.path.join(
+                FLAGS.modelZooBasePath, "modelhub",
+                flags.modelName.split(":")[-1], "model.ckpt")
+        else:
+            checkpoint_path = flags.checkpointPath
+
+        ckp_dir = os.path.dirname(checkpoint_path)
         train_config_path = os.path.join(ckp_dir, "train_config.json")
         if tf.gfile.Exists(train_config_path):
-            predict_checkpoint_path = flags.checkpointPath
+            predict_checkpoint_path = checkpoint_path
         else:
             raise RuntimeError("Checkpoint in {} not found".format(ckp_dir))
 
@@ -269,19 +278,30 @@ class AppConfig(Config):
                 'num_eval_steps': None
             }
         }
+
+        if "pretrain_model_name_or_path" in config_json['model_config']:
+            config_json['model_config']['pretrain_model_name_or_path'] = get_pretrain_model_name_or_path(
+                config_json['model_config']['pretrain_model_name_or_path'])
+
         if not config_json['model_config']['model_name'].startswith("text_match_bert"):
             config_json['model_config']['vocab_path'] =  os.path.join(
                 os.path.dirname(predict_checkpoint_path), "train_vocab.txt")
         return config_json
 
     def build_predict_config(self, flags):
-        input_table = FLAGS.tables if "PAI" in tf.__version__ else flags.inputTable
-        output_table = FLAGS.outputs if "PAI" in tf.__version__ else flags.outputTable
-        ckp_dir = os.path.dirname(flags.checkpointPath) \
-            if '/' in flags.checkpointPath else flags.checkpointPath
+        input_table = flags.inputTable
+        output_table = flags.outputTable
+
+        if flags.modelName.startswith("modelhub"):
+            checkpoint_path = os.path.join(FLAGS.modelZooBasePath, "modelhub", flags.modelName.split(":")[-1])
+        else:
+            checkpoint_path = flags.checkpointPath
+
+        ckp_dir =  checkpoint_path if tf.gfile.IsDirectory(checkpoint_path) \
+            else os.path.dirname(checkpoint_path)
         train_config_path = os.path.join(ckp_dir, "train_config.json")
         if tf.gfile.Exists(train_config_path):
-            predict_checkpoint_path = flags.checkpointPath
+            predict_checkpoint_path = checkpoint_path
         else:
             raise RuntimeError("Checkpoint in {} not found".format(ckp_dir))
 
@@ -295,9 +315,14 @@ class AppConfig(Config):
         if flags.inputSchema:
             input_schema = flags.inputSchema
         else:
-            if "PAI" in tf.__version__:
+            if "odps://" in input_table and "PAI" in tf.__version__:
+                selected_columns = [first_sequence, second_sequence] + append_columns
+                for key, val in train_config_dict['_config_json']["model_config"].items():
+                    if key.endswith("column_name"):
+                        selected_columns.append(val)
+                selected_columns = set(selected_columns)
                 input_schema = get_selected_columns_schema(
-                    input_table, set([first_sequence, second_sequence] + append_columns))
+                    input_table, selected_columns)
             else:
                 input_schema = flags.inputSchema
         output_schema = flags.outputSchema
@@ -392,10 +417,11 @@ class AppConfig(Config):
             with tf.gfile.Open(train_config_path) as f:
                 train_config_json = json.load(f)
             model_config = train_config_json["_config_json"]["model_config"]
+
             model_name = model_config["model_name"]
 
             config_json = {
-                "model_config": train_config_json["_config_json"]["model_config"],
+                "model_config": model_config,
                 "export_config": {
                     "input_tensors_schema": _name_to_app_model[model_name].get_input_tensor_schema(),
                     "receiver_tensors_schema": _name_to_app_model[model_name].get_received_tensor_schema(),
@@ -407,5 +433,6 @@ class AppConfig(Config):
             config_json["model_config"]["vocab_path"] = vocab_path
             self.input_schema = config_json["export_config"]["input_tensors_schema"]
             self.sequence_length = train_config_json["sequence_length"]
+            self.label_enumerate_values =  train_config_json.get("label_enumerate_values", None)
 
         return config_json
