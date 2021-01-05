@@ -19,6 +19,10 @@ sys.path.append("./")
 import json
 import os
 import tensorflow as tf
+try:
+    import tensorflow_io as tfio
+except:
+    pass
 from easytransfer import Config, FLAGS
 from easytransfer.app_zoo.app_utils import get_all_columns_name, get_selected_columns_schema
 from easytransfer.app_zoo.feature_extractor import BertFeatureExtractor
@@ -139,6 +143,15 @@ class BertFeatConfig(Config):
 
 
 def main():
+    # Here is a hack for DSW access OSS
+    for argname in ["inputTable", "outputTable", "modelName"]:
+        arg = getattr(_APP_FLAGS, argname)
+        if arg:
+            arg =  arg.replace("\\x01", "\x01").replace("\\x02", "\x02")
+            setattr(_APP_FLAGS, argname, arg)
+    FLAGS.modelZooBasePath = FLAGS.modelZooBasePath.replace("\\x01", "\x01").replace("\\x02", "\x02")
+
+    # Main function start
     config = BertFeatConfig()
     app = BertFeatureExtractor(user_defined_config=config)
     app.run()

@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from easytransfer.engines.distribution import Process
-import numpy as np
 import six
+import numpy as np
+from easytransfer.engines.distribution import Process
 
 
 class ClassificationPostprocessor(Process):

@@ -60,10 +60,11 @@ class SentPairClsApplication(base_model):
         super(SentPairClsApplication, self).__init__(**kwargs)
 
     def build_logits(self, features, mode=None):
-        preprocessor = preprocessors.get_preprocessor(self.pretrain_model_name_or_path, is_paired=True)
+        preprocessor = preprocessors.get_preprocessor(self.pretrain_model_name_or_path)
         model = model_zoo.get_pretrained_model(self.pretrain_model_name_or_path)
-        input_ids_a, input_mask_a, segment_ids_a, input_ids_b, input_mask_b, segment_ids_b, label_ids, texts1, texts2, domains, labels = preprocessor(features)
-        outputs = model([input_ids_a, input_mask_a, segment_ids_a, input_ids_b, input_mask_b, segment_ids_b], mode=mode)
+
+        input_ids, input_mask, segment_ids, label_ids, texts1, texts2, domains, labels = preprocessor(features)
+        outputs = model([input_ids, input_mask, segment_ids], mode=mode)
         pooled_output = outputs[1]
         ret = {"pooled_output": pooled_output, "text1": texts1, "text2": texts2, "domain": domains, "label": labels}
         return ret
@@ -114,7 +115,7 @@ def main(_):
             domain_class_embeddings[key_name] = list()
 
     # for training data
-    if FLAGS.usePAI:
+    if "PAI" in tf.__version__:
         predict_reader = OdpsTableReader(input_glob=app.predict_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.predict_batch_size)
     else:
         predict_reader = CSVReader(input_glob=app.predict_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.predict_batch_size)
@@ -150,7 +151,7 @@ def main(_):
         centroid_embeddings[key_name] = np.mean(domain_class_data_embeddings, axis=0)
 
     # output files for meta fine-tune
-    if FLAGS.usePAI:
+    if "PAI" in tf.__version__:
         #write odps tables
         records = []
         if aFLAGS.do_sent_pair:

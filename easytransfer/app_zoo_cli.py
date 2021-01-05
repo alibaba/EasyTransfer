@@ -17,6 +17,10 @@ import sys
 sys.path.append("./")
 
 import tensorflow as tf
+try:
+    import tensorflow_io as tfio
+except:
+    pass
 from easytransfer import FLAGS
 from easytransfer.app_zoo import get_application_model
 from easytransfer.app_zoo.app_config import AppConfig
@@ -81,6 +85,15 @@ _APP_FLAGS = _app_flags.FLAGS
 
 
 def main():
+    # Here is a hack for DSW access OSS
+    for argname in ["inputTable", "outputTable", "checkpointDir", "checkpointPath", "exportDirBase"]:
+        arg = getattr(_APP_FLAGS, argname)
+        if arg:
+            arg =  arg.replace("\\x01", "\x01").replace("\\x02", "\x02")
+            setattr(_APP_FLAGS, argname, arg)
+    FLAGS.modelZooBasePath = FLAGS.modelZooBasePath.replace("\\x01", "\x01").replace("\\x02", "\x02")
+
+    # Main function start
     config = AppConfig(mode=FLAGS.mode, flags=_APP_FLAGS)
     app = get_application_model(config)
     app.run()

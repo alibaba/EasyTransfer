@@ -126,7 +126,7 @@ def main(_):
 
     app = Application()
 
-    if FLAGS.usePAI:
+    if "PAI" in tf.__version__:
         train_reader = OdpsTableReader(input_glob=app.train_input_fp, is_training=True, input_schema=app.input_schema, batch_size=app.train_batch_size)
         eval_reader = OdpsTableReader(input_glob=app.eval_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.eval_batch_size)
         app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)

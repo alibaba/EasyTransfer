@@ -70,6 +70,10 @@ class LabelingPostprocessor(Process):
                         continue
                     if token_orig_idx == prev_token_idx:
                         continue
+                    if token_pred == -1 or token_pred > len(self.idx_label_map):
+                        token_pred = len(self.idx_label_map) - 1
+                    if self.idx_label_map[token_pred] == "[CLS]" or self.idx_label_map[token_pred] == "[SEP]":
+                        token_pred = len(self.idx_label_map) - 1
                     final_pred.append(self.idx_label_map[token_pred])
                     prev_token_idx = token_orig_idx
                 raw_sequence_length = max(tok_to_orig_index) + 1

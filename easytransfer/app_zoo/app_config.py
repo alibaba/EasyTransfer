@@ -61,6 +61,10 @@ class AppConfig(Config):
             json.dump(self.__dict__, f)
         if hasattr(self, "pretrain_model_name_or_path"):
             copy_pretrain_model_files_to_dir(self.pretrain_model_name_or_path, flags.checkpointDir)
+        if self.label_enumerate_values and "," in self.label_enumerate_values:
+            label_dict = {label: idx for idx, label in enumerate(self.label_enumerate_values.split(","))}
+            with tf.gfile.GFile(os.path.join(flags.checkpointDir, "label_mapping.json"), mode='w') as f:
+                json.dump(label_dict, f)
 
     def build_preprocess_config(self, flags):
         first_sequence, second_sequence, label_name = \

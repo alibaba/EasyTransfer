@@ -910,7 +910,19 @@ class MultiTurnComprehensionPreprocessor(Preprocessor):
             for features in all_feature_list:
                 ret[key].append(getattr(features, key))
 
-        for key, val in ret.items():
-            ret[key] = np.array(val)
-
-        return ret
+        total_sample_num = len(ret["input_ids"])
+        if hasattr(self.config, "preprocess_batch_size"):
+            batch_size = self.config.preprocess_batch_size
+        elif hasattr(self.config, "predict_batch_size"):
+            batch_size = self.config.predict_batch_size
+        else:
+            batch_size = 12
+        for i in range(total_sample_num // batch_size + 1):
+            st = i * batch_size
+            end = (i + 1) * batch_size
+            if st >= total_sample_num:
+                continue
+            new_ret = dict()
+            for key, val in ret.items():
+                new_ret[key] = np.array(val[st:end])
+            self.put(new_ret)

@@ -1,3 +1,4 @@
+import tensorflow as tf
 import whale as wh
 from tensorflow.python.layers.base import Layer
 from .activations import gelu_new
@@ -30,7 +31,7 @@ class Encoder(Layer):
     def __init__(self, config, **kwargs):
         super(Encoder, self).__init__(**kwargs)
         self.layer = [Block(config, name="layer_{}".format(i)) for i in range(config.num_hidden_layers)]
-        #self.layer = [Block(config, name="layer_{}".format(i)) for i in range(3)]
+        self.num_layers = config.num_hidden_layers
 
     def _stage_call(self, layer_index, all_hidden_states, all_att_outputs, hidden_states, attention_mask, training):
         layer_output, att_output = self.layer[layer_index]([hidden_states, attention_mask], training=training)
@@ -40,23 +41,30 @@ class Encoder(Layer):
         return all_hidden_states, all_att_outputs, hidden_states
 
     def call(self, inputs, training=False):
+        tf.logging.info("***************Inside stage to split model**********")
         hidden_states, attention_mask = inputs
 
         all_hidden_states = ()
         all_att_outputs = ()
 
-        bert_large_layers_count = 12
-        assert len(self.layer) == bert_large_layers_count
+        bert_base_layers_count = self.num_layers
+        assert len(self.layer) == bert_base_layers_count
         # Use default scope.
-        for i in range(0, 2):
+        for i in range(0, 3):
             all_hidden_states, all_att_outputs, hidden_states = self._stage_call(i, all_hidden_states, all_att_outputs, hidden_states, attention_mask, training)
 
-        # with wh.stage():
-        #     for i in range(each_stage_layers_count, 2*each_stage_layers_count):
-        #         all_hidden_states, all_att_outputs, hidden_states = self._stage_call(i, all_hidden_states, all_att_outputs, hidden_states, attention_mask, training)
+        with wh.stage():
+            for i in range(3, 6):
+                all_hidden_states, all_att_outputs, hidden_states = self._stage_call(i, all_hidden_states, all_att_outputs, hidden_states, attention_mask, training)
+            wh.current_scope_as_default()
 
         with wh.stage():
-            for i in range(2, 12):
+            for i in range(6, 9):
+                all_hidden_states, all_att_outputs, hidden_states = self._stage_call(i, all_hidden_states, all_att_outputs, hidden_states, attention_mask, training)
+            wh.current_scope_as_default()
+
+        with wh.stage():
+            for i in range(9, 12):
                 all_hidden_states, all_att_outputs, hidden_states = self._stage_call(i, all_hidden_states, all_att_outputs, hidden_states, attention_mask, training)
             wh.current_scope_as_default()
 

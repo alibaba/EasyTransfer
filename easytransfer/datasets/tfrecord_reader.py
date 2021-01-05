@@ -115,12 +115,6 @@ class BundleTFRecordReader(TFRecordReader):
                     d = d.shard(len(self.worker_hosts.split(',')), self.task_index)
                 d = d.repeat()
                 d = d.shuffle(buffer_size=len(self.input_fps))
-                """
-                def passthrough(path):
-                    return tf.Print(path, [path], message='Path=')
-
-                d = d.map(passthrough, num_parallel_calls=1)
-                """
                 cycle_length = min(4, len(self.input_fps))
                 d = d.apply(
                     tf.data.experimental.parallel_interleave(
@@ -129,8 +123,6 @@ class BundleTFRecordReader(TFRecordReader):
                         cycle_length=cycle_length))
 
                 d = d.shuffle(buffer_size=self.shuffle_buffer_size)
-
-
 
             else:
                 d = tf.data.TFRecordDataset(self.input_fps)

@@ -14,13 +14,13 @@ requirements = ['numpy',
 setup(
     # Metadata
     name='easytransfer',
-    version='0.1.3',
+    version='0.1.4',
     python_requires='>=2.7,>=3.6',
     author='PAI NLP',
     author_email='minghui.qmh@alibaba-inc.com,'
                  'jerry.lp@alibaba-inc.com,'
                  'haojie.phj@alibaba-inc.com',
-    url='http://gitlab.alibaba-inc.com/groups/PAI-TL',
+    url='https://github.com/alibaba/EasyTransfer',
     description='PAI EasyTransfer Toolkit',
     long_description=readme,
     long_description_content_type='text/markdown',

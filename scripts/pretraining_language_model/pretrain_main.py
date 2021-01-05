@@ -236,6 +236,7 @@ def run(mode):
     if "train" in mode:
         if _APP_FLAGS.data_reader == 'tfrecord':
             train_reader = BundleTFRecordReader(input_glob=app.train_input_fp,
+                                                distribution_strategy=app.config.distribution_strategy,
                                                 is_training=True,
                                                 shuffle_buffer_size=1024,
                                                 worker_hosts=FLAGS.worker_hosts,
@@ -258,6 +259,7 @@ def run(mode):
     if mode == "train_and_evaluate":
         if _APP_FLAGS.data_reader == 'tfrecord':
             eval_reader = BundleTFRecordReader(input_glob=app.eval_input_fp,
+                                               distribution_strategy=app.config.distribution_strategy,
                                                is_training=False,
                                                shuffle_buffer_size=1024,
                                                worker_hosts=FLAGS.worker_hosts,
@@ -356,6 +358,7 @@ def preprocess():
         po.apply_async(func=run_preprocess, args=(input_file, output_file))
     po.close()
     po.join()
+    tf.logging.info("done")
 
 
 def main():

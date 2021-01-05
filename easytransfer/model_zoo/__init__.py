@@ -36,9 +36,6 @@ def get_pretrained_model(pretrain_model_name_or_path, **kwargs):
         elif model_type == 'videobert':
             from .modeling_videobert import VideoBertPreTrainedModel
             return VideoBertPreTrainedModel.get(pretrain_model_name_or_path, **kwargs)
-        elif model_type == "factorizedbert":
-            from .modeling_factorizedbert import FactorizedBertPreTrainedModel
-            return FactorizedBertPreTrainedModel.get(pretrain_model_name_or_path, **kwargs)
         else:
             raise NotImplementedError
     else:
@@ -67,9 +64,6 @@ def get_pretrained_model(pretrain_model_name_or_path, **kwargs):
         elif model_type == 'videobert':
             from .modeling_videobert import VideoBertPreTrainedModel
             return VideoBertPreTrainedModel.get(pretrain_model_name_or_path, **kwargs)
-        elif model_type == "factorizedbert":
-            from .modeling_factorizedbert import FactorizedBertPreTrainedModel
-            return FactorizedBertPreTrainedModel.get(pretrain_model_name_or_path, **kwargs)
         else:
             raise ValueError("model_type should be in bert, roberta, albert, imagebert, videobert")
 
@@ -93,10 +87,6 @@ def get_config_path(model_type, pretrain_model_name_or_path):
     elif model_type == 'videobert':
         from .modeling_videobert import VideoBertPreTrainedModel
         config_path = VideoBertPreTrainedModel.pretrained_config_archive_map[
-            pretrain_model_name_or_path]
-    elif model_type == "factorizedbert":
-        from .modeling_factorizedbert import FactorizedBertPreTrainedModel
-        config_path = FactorizedBertPreTrainedModel.pretrained_config_archive_map[
             pretrain_model_name_or_path]
     else:
         raise ValueError("model_type should be in bert, roberta, albert, imagebert, videobert")

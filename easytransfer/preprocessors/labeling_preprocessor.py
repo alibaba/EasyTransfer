@@ -15,6 +15,7 @@
 
 
 import tensorflow as tf
+import traceback
 from collections import OrderedDict
 from .preprocessor import Preprocessor, PreprocessorConfig
 from .tokenization import convert_to_unicode
@@ -81,6 +82,8 @@ class SequenceLabelingPreprocessor(Preprocessor):
         tok_to_orig_index = [-1]
         for i, token in enumerate(content_tokens):
             sub_tokens = self.config.tokenizer.tokenize(token)
+            if not sub_tokens:
+                sub_tokens = ["[UNK]"]
             all_tokens.extend(sub_tokens)
             tok_to_orig_index.extend([i] * len(sub_tokens))
             if label_tags is None:
@@ -108,7 +111,7 @@ class SequenceLabelingPreprocessor(Preprocessor):
         assert len(input_mask) == self.config.sequence_length
         assert len(segment_ids) ==  self.config.sequence_length
         assert len(label_ids) == self.config.sequence_length
-        assert max(tok_to_orig_index) == len(content_tokens) - 1
+        assert max(tok_to_orig_index) == len(content_tokens) - 1, "Abnormal line: {}".format(items)
         return ' '.join([str(t) for t in input_ids]), \
                ' '.join([str(t) for t in input_mask]), \
                ' '.join([str(t) for t in segment_ids]), \

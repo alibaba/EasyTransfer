@@ -110,27 +110,32 @@ class PreprocessorConfig(object):
 
         if "/" not in pretrain_model_name_or_path:
             model_type = pretrain_model_name_or_path.split("-")[1]
-            if six.PY2:
-                import errno
-                def mkdir_p(path):
-                    try:
-                        os.makedirs(path)
-                    except OSError as exc:  # Python >2.5 (except OSError, exc: for Python <2.5)
-                        if exc.errno == errno.EEXIST and os.path.isdir(path):
-                            pass
-                        else:
-                            raise
-                mkdir_p(os.path.join(FLAGS.modelZooBasePath, model_type))
+            if tf.gfile.Exists(os.path.join(FLAGS.modelZooBasePath, model_type,
+                                                pretrain_model_name_or_path, "config.json")):
+                # If exists directory, not download
+                pass
             else:
-                os.makedirs(os.path.join(FLAGS.modelZooBasePath, model_type), exist_ok=True)
+                if six.PY2:
+                    import errno
+                    def mkdir_p(path):
+                        try:
+                            os.makedirs(path)
+                        except OSError as exc:  # Python >2.5 (except OSError, exc: for Python <2.5)
+                            if exc.errno == errno.EEXIST and os.path.isdir(path):
+                                pass
+                            else:
+                                raise
+                    mkdir_p(os.path.join(FLAGS.modelZooBasePath, model_type))
+                else:
+                    os.makedirs(os.path.join(FLAGS.modelZooBasePath, model_type), exist_ok=True)
 
-            des_path = os.path.join(os.path.join(FLAGS.modelZooBasePath, model_type),
-                                    pretrain_model_name_or_path + ".tgz")
-            if not os.path.exists(des_path):
-                tf.logging.info("********** Begin to download to {} **********".format(des_path))
-                os.system(
-                    'wget -O ' + des_path + ' https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_modelzoo/' + model_type + '/' + pretrain_model_name_or_path + ".tgz")
-                os.system('tar -zxvf ' + des_path + ' --directory ' + FLAGS.modelZooBasePath + "/" + model_type)
+                des_path = os.path.join(os.path.join(FLAGS.modelZooBasePath, model_type),
+                                        pretrain_model_name_or_path + ".tgz")
+                if not os.path.exists(des_path):
+                    tf.logging.info("********** Begin to download to {} **********".format(des_path))
+                    os.system(
+                        'wget -O ' + des_path + ' https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_modelzoo/' + model_type + '/' + pretrain_model_name_or_path + ".tgz")
+                    os.system('tar -zxvf ' + des_path + ' --directory ' + FLAGS.modelZooBasePath + "/" + model_type)
 
         if "train" in self.mode:
             model_dir = kwargs['model_dir']

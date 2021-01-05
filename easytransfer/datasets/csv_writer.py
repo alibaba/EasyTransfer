@@ -31,10 +31,7 @@ class CSVWriter(Process):
         job_name = 'DistTableWriter'
         super(CSVWriter, self).__init__(job_name, 1, input_queue)
 
-        if six.PY3:
-            self.writer = open(output_glob, "w", encoding='utf8')
-        elif six.PY2:
-            self.writer = open(output_glob, "w")
+        self.writer = tf.gfile.Open(output_glob, "w")
 
         self.output_schema = output_schema
 
