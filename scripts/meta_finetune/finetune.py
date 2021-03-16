@@ -22,7 +22,7 @@ from easytransfer import base_model
 from easytransfer import layers, FLAGS
 from easytransfer import model_zoo
 from easytransfer import preprocessors
-from easytransfer.datasets import CSVReader, OdpsTableReader
+from easytransfer.datasets import CSVReader, OdpsTableReader, CSVWriter, OdpsTableWriter
 from easytransfer.evaluators import classification_eval_metrics
 
 
@@ -48,19 +48,34 @@ class Application(base_model):
 
     def build_eval_metrics(self, logits, labels):
         return classification_eval_metrics(logits, labels, self.num_labels)
+    
+    def build_predictions(self, output):
+        logits, _ = output
+        predictions = dict()
+        predictions["predictions"] = tf.argmax(logits, axis=-1, output_type=tf.int32)
+        return predictions
 
-
+    
 def main(_):
     app = Application()
-    if "PAI" in tf.__version__:
-        train_reader = OdpsTableReader(input_glob=app.train_input_fp, is_training=True, input_schema=app.input_schema, batch_size=app.train_batch_size)
-        eval_reader = OdpsTableReader(input_glob=app.eval_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.eval_batch_size)
-    else:
-        train_reader = CSVReader(input_glob=app.train_input_fp, is_training=True, input_schema=app.input_schema, batch_size=app.train_batch_size)
-        eval_reader = CSVReader(input_glob=app.eval_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.eval_batch_size)
-
-    app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
-
+    if FLAGS.mode == "train_and_evaluate_on_the_fly":
+        if "PAI" in tf.__version__:
+            train_reader = OdpsTableReader(input_glob=app.train_input_fp, is_training=True, input_schema=app.input_schema, batch_size=app.train_batch_size)
+            eval_reader = OdpsTableReader(input_glob=app.eval_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.eval_batch_size)
+        else:
+            train_reader = CSVReader(input_glob=app.train_input_fp, is_training=True, input_schema=app.input_schema, batch_size=app.train_batch_size)
+            eval_reader = CSVReader(input_glob=app.eval_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.eval_batch_size)
+        app.run_train_and_evaluate(train_reader=train_reader, eval_reader=eval_reader)
+        
+    if FLAGS.mode == "predict_on_the_fly":
+        if "PAI" in tf.__version__:
+            pred_reader = OdpsTableReader(input_glob=app.predict_input_fp, input_schema=app.input_schema, is_training=False, batch_size=app.predict_batch_size)
+            pred_writer = OdpsTableWriter(output_glob=app.predict_output_fp, output_schema=app.output_schema, slice_id=0, input_queue=None)
+        else:
+            pred_reader = CSVReader(input_glob=app.predict_input_fp, is_training=False, input_schema=app.input_schema, batch_size=app.predict_batch_size)
+            pred_writer = CSVWriter(output_glob=app.predict_output_fp, output_schema=app.output_schema)
+        app.run_predict(reader=pred_reader, writer=pred_writer, checkpoint_path=app.predict_checkpoint_path)
+        
 
 if __name__ == '__main__':
     tf.app.run()

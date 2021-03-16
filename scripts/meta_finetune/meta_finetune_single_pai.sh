@@ -27,7 +27,7 @@ tar -zcf metaft.tar.gz scripts/meta_finetune/
 job_path='file://'${cur_path}'/metaft.tar.gz'
 
 command="
-pai -name easytransfer_opensource
+pai -name easytransfer
 -project algo_platform_dev
 -Dmode=train_and_evaluate_on_the_fly
 -Dconfig=scripts/meta_finetune/config/meta_finetune_single.json

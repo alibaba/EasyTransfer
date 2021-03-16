@@ -19,12 +19,6 @@ if [ ! -f ./mnli_train.tsv ]; then
     wget http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/meta_finetune/mnli/mnli_train.tsv
 fi
 
-if [ ! -f ./google-bert-base-en/config.json ]; then
-   wget https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_modelzoo/bert/google-bert-base-en.tgz
-   tar zxvf google-bert-base-en.tgz -C ./
-   rm -f google-bert-base-en.tgz
-fi
-
 outputs="mnli_train_weights.tsv"
 domains="telephone,government,slate,travel,fiction"
 classes="entailment,neutral,contradiction"

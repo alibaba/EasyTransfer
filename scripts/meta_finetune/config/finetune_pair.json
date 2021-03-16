@@ -1,6 +1,7 @@
 {
   "preprocess_config": {
     "input_schema": "text1:str:1,text2:str:1,domain:str:1,label:str:1",
+    "output_schema": "text1,text2,predictions",
     "sequence_length": 128,
     "first_sequence": "text1",
     "second_sequence": "text2",
@@ -8,7 +9,7 @@
     "label_enumerate_values": "entailment,neutral,contradiction"
   },
   "model_config": {
-      "pretrain_model_name_or_path": "oss://pai-wcy/easytransfer/meta_ft/mnli_meta_ft/model.ckpt-23919",
+      "pretrain_model_name_or_path": "mnli_meta_ft/model.ckpt-23919",
       "num_labels": 3
   },
   "train_config": {
@@ -16,7 +17,7 @@
       "train_batch_size": 32,
       "save_steps": null,
       "train_input_fp": "mnli_train_telephone.tsv",
-      "model_dir": "oss://pai-wcy/easytransfer/meta_ft/mnli_telephone_ft",
+      "model_dir": "mnli_telephone_ft",
       "learning_rate": 1e-5,
       "throttle_secs": 100,
       "num_epochs": 6,
@@ -36,5 +37,26 @@
       "eval_input_fp": "mnli_dev_telephone.tsv",
       "eval_batch_size": 32,
       "num_eval_steps": null
+  },
+  "predict_config": {
+    "predict_checkpoint_path": "mnli_telephone_ft/model.ckpt-331",
+    "predict_input_fp": "mnli_train_telephone.tsv",
+    "predict_batch_size": 32,
+    "predict_output_fp": "mnli_train_telephone_output.tsv"
   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

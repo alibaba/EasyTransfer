@@ -14,23 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+config="./config/finetune_pair.json"
 
-if [ ! -f ./amazon_train.tsv ]; then
-    wget http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/tutorial/meta_finetune/amazon/amazon_train.tsv
-fi
-
-outputs="amazon_train_weights.tsv"
-domains="books,dvd,electronics,kitchen"
-classes="POS,NEG"
-do_sent_pair=False
-config="./config/preprocess_single.json"
-
-echo "preprocess..."
-python preprocess.py \
-     --outputs=${outputs} \
-     --do_sent_pair=${do_sent_pair} \
-     --domains=${domains} \
-     --classes=${classes} \
+echo "predict..."
+python finetune.py \
      --config=${config} \
      --mode="predict_on_the_fly"
+
 
