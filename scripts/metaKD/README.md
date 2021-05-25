@@ -27,7 +27,7 @@ $ sh run_meta_distill.sh
 If you use this code, please cite the following paper. Thanks.
 
 ```
-@article{pan2018metakd,
+@article{pan2021metakd,
   author    = {Haojie Pan and
                Chengyu Wang and
                Minghui Qiu and
