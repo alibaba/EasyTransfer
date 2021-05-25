@@ -22,3 +22,21 @@ $ sh run_meta_teacher.sh
 ```bash
 $ sh run_meta_distill.sh
 ```
+
+
+If you use this code, please cite the following paper. Thanks.
+
+```
+@article{pan2018metakd,
+  author    = {Haojie Pan and
+               Chengyu Wang and
+               Minghui Qiu and
+               Yichang Zhang and
+               Yaliang Li and
+               Jun Huang},
+  title     = {Meta-KD: A Meta Knowledge Distillation Framework for Language Model
+               Compression across Domains},
+  journal   = {ACL},
+  year      = {2021}
+}
+```
