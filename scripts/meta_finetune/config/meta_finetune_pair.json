@@ -17,7 +17,7 @@
       "train_batch_size": 32,
       "save_steps": null,
       "train_input_fp": "mnli_train_weights.tsv",
-      "model_dir": "oss://pai-wcy/easytransfer/meta_ft/mnli_meta_ft",
+      "model_dir": "mnli_meta_ft",
       "learning_rate": 1e-5,
       "throttle_secs": 100,
       "num_epochs": 2,

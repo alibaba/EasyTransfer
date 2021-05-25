@@ -14,7 +14,7 @@
       "num_labels": 3
     },
     "predict_config": {
-      "predict_checkpoint_path": "oss://pai-wcy/easytransfer/model/google-bert-base-en/model.ckpt",
+      "predict_checkpoint_path": "/home/admin/.eztransfer_modelzoo/bert/google-bert-base-en/model.ckpt",
       "predict_input_fp": "mnli_train.tsv",
       "predict_batch_size": 32,
       "predict_output_fp": null
