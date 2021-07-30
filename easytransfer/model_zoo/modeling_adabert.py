@@ -555,7 +555,7 @@ class AdaBERTStudent(object):
                           h1_res, h1_skip])
             op_weights = tf.reshape(alpha, [-1, 1, 1, 1])
             # (bs, seq_len, emb_dim)
-            h = tf.reduce_sum(h * op_weights, 0)
+            h = tf.reduce_sum(h * tf.to_float(op_weights), 0)
         return h
 
     def build_cnn3(self, x, is_training):
