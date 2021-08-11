@@ -497,7 +497,7 @@ class AdaBERTStudent(object):
                     tf.logging.info("excluded edge {}-{}".format(src, index))
                     continue
                 states.append(
-                    self.build_edge(h, arch_params[(src, index)] if arch_params else given_arch[(src, index)],
+                    self.build_edge(h, arch_params[(src, index)] if arch_params else int(given_arch[(src, index)]),
                                     is_training, src, index))
         return tf.add_n(states)
 
