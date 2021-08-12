@@ -178,20 +178,19 @@ Also we can scan the following QR code to join wechat discussion group.
 ```text
 @article{easytransfer,
     author = {Minghui Qiu and 
-            Peng Li and 
-            Hanjie Pan and 
-            Chengyu Wang and 
-            Cen Chen and 
-            Yaliang Li and 
-            Dehong Gao and 
-            Jun Huang and 
-            Yong Li and 
-            Jun Yang and 
-            Deng Cai and 
-            Wei Lin},
+	    Peng Li and 
+	    Chengyu Wang and 
+	    Haojie Pan and 
+	    An Wang and 
+	    Cen Chen and 
+	    Xianyan Jia and 
+	    Yaliang Li and 
+	    Jun Huang and 
+	    Deng Cai and 
+	    Wei Lin},
     title = {EasyTransfer - A Simple and Scalable Deep Transfer Learning Platform for NLP Applications
 },
-    journal = {arXiv:2011.09463},
+    journal = {CIKM 2021},
     url = {https://arxiv.org/abs/2011.09463},
     year = {2020}
 }
