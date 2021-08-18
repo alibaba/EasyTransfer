@@ -192,6 +192,6 @@ Also we can scan the following QR code to join wechat discussion group.
 },
     journal = {CIKM 2021},
     url = {https://arxiv.org/abs/2011.09463},
-    year = {2020}
+    year = {2021}
 }
 ```
