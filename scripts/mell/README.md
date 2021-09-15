@@ -8,7 +8,7 @@
 ## How to run the code
 1. Preprocess the data
 ```bash
-$ tar zxvf xxx.tar.gz
+$ tar zxvf data.tar.gz
 ```
 
 2. Run the initial learning stage of MeLL
