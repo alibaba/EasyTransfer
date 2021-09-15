@@ -1,42 +1,44 @@
-# Meta-KD: A Meta Knowledge Distillation Framework for Language Model Compression across Domains
+# MeLL: Large-scale Extensible User Intent Classification for Dialogue Systems with Meta Lifelong Learning
 
 
 ## How to build the dataset
-1. The MNLI dataset can be found in this [link](https://cims.nyu.edu/~sbowman/multinli/) 
-2. The Amazon Review dataset can be found in this [link](https://www.cs.jhu.edu/~mdredze/datasets/sentiment/index2.html)
-one can randomly split the dataset as the paper mentions.
+1. The dataset can be found in this [link](https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/release/Mell/data.tar.gz) 
 
 
 ## How to run the code
 1. Preprocess the data
 ```bash
-$ sh run_meta_preprocess.sh
+$ tar zxvf xxx.tar.gz
 ```
 
-2. Meta-teacher learning
+2. Run the initial learning stage of MeLL
 ```bash
-$ sh run_meta_teacher.sh
+$ sh run_mell_initial.sh
 ```
 
-3. Meta-distillation
+3. Run the lifelong learning stage of MeLL
 ```bash
-$ sh run_meta_distill.sh
+$ sh run_mell_lifelong.sh
 ```
 
 
 If you use this code, please cite the following paper. Thanks.
 
 ```
-@article{pan2021metakd,
-  author    = {Haojie Pan and
-               Chengyu Wang and
-               Minghui Qiu and
-               Yichang Zhang and
-               Yaliang Li and
-               Jun Huang},
-  title     = {Meta-KD: A Meta Knowledge Distillation Framework for Language Model
-               Compression across Domains},
-  journal   = {ACL},
-  year      = {2021}
+@inproceedings{kdd2021,
+  author    = {Chengyu Wang and
+                Haojie Pan and
+                Yuan Liu and
+                Kehan Chen and
+                Minghui Qiu and
+                Wei Zhou and
+                Jun Huang and
+                Haiqing Chen and
+                Wei Lin and
+                Deng Cai},
+  title     = {MeLL: Large-scale Extensible User Intent Classification for Dialogue Systems with Meta Lifelong Learning},
+  booktitle = {Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery and Data Mining},
+  year      = {2021},
+  pages     = {3649–3659}
 }
 ```
