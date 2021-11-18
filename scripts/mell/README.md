@@ -2,7 +2,7 @@
 
 
 ## How to build the dataset
-1. The dataset can be found in this [link](https://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/release/Mell/data.tar.gz) 
+1. The dataset can be found in this [link](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/datasets/mell/data.tar.gz) 
 
 
 ## How to run the code
