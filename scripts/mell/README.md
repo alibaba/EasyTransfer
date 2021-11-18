@@ -8,6 +8,7 @@
 ## How to run the code
 1. Preprocess the data
 ```bash
+$ wget http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/datasets/mell/data.tar.gz
 $ tar zxvf data.tar.gz
 ```
 
