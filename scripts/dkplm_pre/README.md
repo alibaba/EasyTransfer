@@ -1,1 +1,1 @@
-# DKPLM: Decomposable Knowledge-enhanced Pre-trained Language Model forNatural Language Understanding
+# DKPLM: Decomposable Knowledge-enhanced Pre-trained Language Model for Natural Language Understanding
