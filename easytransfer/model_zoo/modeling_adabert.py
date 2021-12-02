@@ -497,7 +497,7 @@ class AdaBERTStudent(object):
                     tf.logging.info("excluded edge {}-{}".format(src, index))
                     continue
                 states.append(
-                    self.build_edge(h, arch_params[(src, index)] if arch_params else given_arch[(src, index)],
+                    self.build_edge(h, arch_params[(src, index)] if arch_params else int(given_arch[(src, index)]),
                                     is_training, src, index))
         return tf.add_n(states)
 
@@ -555,7 +555,7 @@ class AdaBERTStudent(object):
                           h1_res, h1_skip])
             op_weights = tf.reshape(alpha, [-1, 1, 1, 1])
             # (bs, seq_len, emb_dim)
-            h = tf.reduce_sum(h * op_weights, 0)
+            h = tf.reduce_sum(h * tf.to_float(op_weights), 0)
         return h
 
     def build_cnn3(self, x, is_training):
