@@ -113,3 +113,7 @@ Our paper citation is:
 The code is developed based on [pet](https://github.com/timoschick/pet).
 We appreciate all the authors who made their code public, which greatly facilitates this project. 
 This repository would be continuously updated.
+
+---
+
+This code has also been commited in the same way for the homepage of author Jianing Wang, you can find it in [https://github.com/wjn1996/TransPrompt](https://github.com/wjn1996/TransPrompt).
