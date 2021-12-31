@@ -1,6 +1,6 @@
 # TransPrompt
 
-This code is implement for our EMNLP 2021's paper 《TransPrompt：Towards an Automatic Transferable Prompting Framework for Few-shot Text Classification》.
+This code is implement for our EMNLP 2021's paper [《TransPrompt：Towards an Automatic Transferable Prompting Framework for Few-shot Text Classification》](https://aclanthology.org/2021.emnlp-main.221/).
 
 Our proposed TransPrompt is motivated by the join of prompt-tuning and cross-task transfer learning. 
 The aim is to explore and exploit the transferable knowledge from similar tasks in the few-shot scenario, 
