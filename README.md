@@ -160,7 +160,7 @@ ModelZoo：[https://www.yuque.com/easytransfer/itfpm9/oszcof](https://www.yuque.
 
 AppZoo：[https://www.yuque.com/easytransfer/itfpm9/ky6hky](https://www.yuque.com/easytransfer/itfpm9/ky6hky)
 
-API docs：[http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_docs/html/index.html](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/eztransfer_docs/html/index.html)
+API docs：[http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/release/eztransfer_docs/html/index.html](http://atp-modelzoo-sh.oss-cn-shanghai.aliyuncs.com/release/eztransfer_docs/html/index.html)
 
 
 # Contact Us
