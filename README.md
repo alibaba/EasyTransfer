@@ -1,13 +1,3 @@
-<p align="center">
-    <br>
-    <img src="https://cdn.nlark.com/yuque/0/2020/png/2480469/1600401425964-828d6ffe-90d7-4cda-9b76-b9f17e35f11f.png#align=left&display=inline&height=188&margin=%5Bobject%20Object%5D&name=image.png&originHeight=608&originWidth=649&size=41423&status=done&style=none&width=201" width="200"/>
-    <br>
-    <a href="https://www.yuque.com/easytransfer/itfpm9/ah0z6o">
-        <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258840-bfe6302e-d934-409d-917c-8eab455675c1.svg" height="24">
-    </a>
-</p>
-
-
 # NOTICE: Please Checkout New Features In: [**EasyNLP**](https://github.com/alibaba/EasyNLP)
 
 # Intro
@@ -191,3 +181,14 @@ Also we can scan the following QR code to join wechat discussion group.
     year = {2021}
 }
 ```
+
+<p align="center">
+    <br>
+    <img src="https://cdn.nlark.com/yuque/0/2020/png/2480469/1600401425964-828d6ffe-90d7-4cda-9b76-b9f17e35f11f.png#align=left&display=inline&height=188&margin=%5Bobject%20Object%5D&name=image.png&originHeight=608&originWidth=649&size=41423&status=done&style=none&width=201" width="200"/>
+    <br>
+    <a href="https://www.yuque.com/easytransfer/itfpm9/ah0z6o">
+        <img src="https://cdn.nlark.com/yuque/0/2020/svg/2480469/1600310258840-bfe6302e-d934-409d-917c-8eab455675c1.svg" height="24">
+    </a>
+</p>
+
+
