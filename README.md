@@ -117,25 +117,12 @@ To learn more about the usage of AppZoo, please refer to our [documentation](htt
 - [Meta Fine-tuning for Cross-domain Text Classification](https://www.yuque.com/easytransfer/cn/mgy5gb)
 
 
-
-# [CLUE Benchmark](https://www.cluebenchmarks.com/)
-
+# [EasyNLP for CLUE Benchmark](https://github.com/alibaba/EasyNLP/tree/master/benchmarks/clue)
 
 
-|  | TNEWS | AFQMC | IFLYTEK | CMNLI | CSL | Average |
-| --- | --- | --- | --- | --- | --- | --- |
-| google-bert-base-zh | 0.6673 | 0.7375 | 0.5968 | 0.7981 | 0.7976 | 0.7194 |
-| pai-bert-base-zh | 0.6694 | 0.7412 | 0.6114 | 0.7967 | 0.7993 | 0.7236 |
-| hit-roberta-base-zh | 0.6734 | 0.7418 | 0.6052 | 0.8010 | 0.8010 | 0.7245 |
-| hit-roberta-large-zh | 0.6742 | 0.7521 | 0.6052 | 0.8231 | 0.8100 | 0.7329 |
-| google-albert-xxlarge-zh | 0.6253 | 0.6899 | 0.5017 | 0.7721 | 0.7106 | 0.6599 |
-| pai-albert-xxlarge-zh | 0.6809 | 0.7525 | 0.6118 | 0.8284 | 0.8137 | 0.7375 |
-
-
+Here is the [CLUE benchmark example](https://github.com/alibaba/EasyNLP/tree/master/benchmarks/clue)
 
 You can find more benchmarks in [https://www.yuque.com/easytransfer/cn/rkm4p7](https://www.yuque.com/easytransfer/itfpm9/rkm4p7)
-
-Here is the CLUE quick start [notebook](https://github.com/CLUEbenchmark/EasyTransfer/blob/add_clue_quick_start/clue_quick_start.ipynb)
 
 
 # Links
