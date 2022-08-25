@@ -1,4 +1,4 @@
-# EasyTransfer
+# EasyTransfer:  A Simple and Scalable Deep Transfer Learning Platform for NLP Applications
 
 # Intro
 The literature has witnessed the success of applying deep Transfer Learning (TL) for many real-world NLP applications, yet it is not easy to build an easy-to-use TL toolkit to achieve such a goal. To bridge this gap, EasyTransfer is designed to facilitate users leveraging deep TL for NLP applications at ease. It was developed in Alibaba in early 2017, and has been used in the major BUs in Alibaba group and achieved very good results in 20+ business scenarios. It supports the mainstream pre-trained ModelZoo, including pre-trained language models (PLMs) and multi-modal models on the [PAI](https://www.aliyun.com/product/bigdata/product/learn) platform, integrates the SOTA models for the mainstream NLP applications in AppZoo, and supports knowledge distillation for PLMs. EasyTransfer is very convenient for users to quickly start model training, evaluation, offline prediction, and online deployment. It also provides rich APIs to make the development of NLP and transfer learning easier.
